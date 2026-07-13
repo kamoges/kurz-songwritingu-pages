@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kurz songwritingu — písanie textov pre zhudobnenie</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<style>
+  :root{
+    --paper:#f6f1e7;
+    --paper-2:#efe8d8;
+    --ink:#241f1a;
+    --ink-soft:#5a5147;
+    --line:#d8cdb6;
+    --accent:#9c2b63;      /* hlboká magenta (z grafík leilaspoems) */
+    --accent-2:#45418f;    /* indigo */
+    --gold:#b06a24;        /* teplá oranžovo-zlatá */
+    --card:#fffdf8;
+    --shadow:rgba(60,45,25,.12);
+    --ok:#2f7d4f;
+    --bad:#b23a2e;
+    --radius:4px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:Georgia,'Times New Roman',serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* jemná linajková textúra na pozadí */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:repeating-linear-gradient(transparent,transparent 31px,rgba(120,100,70,.05) 32px);
+  }
+
+  /* ---------- LAYOUT ---------- */
+  .wrap{display:flex;min-height:100vh}
+  .sidebar{
+    width:300px;flex-shrink:0;background:var(--paper-2);
+    border-right:1px solid var(--line);
+    padding:28px 20px;position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  .content{flex:1;max-width:820px;margin:0 auto;padding:48px 40px 120px}
+
+  /* ---------- SIDEBAR ---------- */
+  .brand{font-family:'Courier New',monospace;font-size:12px;letter-spacing:2px;
+    text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+  .brand-title{font-size:22px;line-height:1.25;margin-bottom:22px;font-weight:normal}
+  .brand-title b{font-weight:bold}
+  .progress-box{background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:12px 14px;margin-bottom:22px;font-size:13px}
+  .progress-bar{height:7px;background:var(--line);border-radius:10px;overflow:hidden;margin-top:8px}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent-2),var(--accent) 55%,var(--gold));width:0;transition:width .4s ease}
+  .nav-item{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border-radius:var(--radius);
+    cursor:pointer;font-size:14px;color:var(--ink-soft);transition:background .15s,color .15s;margin-bottom:2px}
+  .nav-item:hover{background:rgba(156,43,99,.07);color:var(--ink)}
+  .nav-item.active{background:var(--accent);color:#fff}
+  .nav-item.active .nav-num{color:#fff;border-color:rgba(255,255,255,.5)}
+  .nav-num{font-family:'Courier New',monospace;font-size:11px;width:22px;height:22px;flex-shrink:0;
+    border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;
+    color:var(--accent);margin-top:1px}
+  .nav-check{margin-left:auto;color:var(--ok);font-size:14px;flex-shrink:0}
+  .nav-group-label{font-family:'Courier New',monospace;font-size:10px;letter-spacing:1.5px;
+    text-transform:uppercase;color:var(--gold);margin:18px 0 8px 10px}
+
+  /* ---------- CONTENT ---------- */
+  .module{display:none;animation:fade .4s ease}
+  .module.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .eyebrow{font-family:'Courier New',monospace;font-size:12px;letter-spacing:2px;
+    text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  h1{font-size:38px;line-height:1.15;font-weight:normal;margin-bottom:8px;letter-spacing:-.5px}
+  h1 .big{display:block;font-size:15px;font-family:'Courier New',monospace;color:var(--gold);
+    letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+  .lede{font-size:19px;color:var(--ink-soft);font-style:italic;margin-bottom:32px;line-height:1.6}
+  h2{font-size:25px;font-weight:normal;margin:38px 0 14px;padding-bottom:8px;
+    border-bottom:2px solid var(--line);letter-spacing:-.3px}
+  h3{font-size:19px;font-weight:bold;margin:26px 0 10px;color:var(--accent-2)}
+  p{margin-bottom:14px}
+  .content ul,.content ol{margin:0 0 16px 22px}
+  .content li{margin-bottom:7px}
+  strong{color:var(--ink)}
+  em{color:var(--ink-soft)}
+
+  .callout{background:var(--card);border-left:4px solid var(--accent);
+    border-radius:0 var(--radius) var(--radius) 0;padding:16px 20px;margin:22px 0;box-shadow:0 2px 8px var(--shadow)}
+  .callout.tip{border-left-color:var(--accent-2)}
+  .callout.warn{border-left-color:var(--gold)}
+  .callout-label{font-family:'Courier New',monospace;font-size:11px;letter-spacing:1.5px;
+    text-transform:uppercase;color:var(--accent);margin-bottom:6px;font-weight:bold}
+  .callout.tip .callout-label{color:var(--accent-2)}
+  .callout.warn .callout-label{color:var(--gold)}
+
+  .lyric{background:var(--paper-2);border:1px dashed var(--line);border-radius:var(--radius);
+    padding:16px 22px;margin:18px 0;font-style:italic;color:var(--ink);white-space:pre-line;line-height:1.9}
+
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:15px;background:var(--card);
+    border-radius:var(--radius);overflow:hidden;box-shadow:0 2px 8px var(--shadow)}
+  th{background:var(--accent-2);color:#fff;text-align:left;padding:11px 14px;font-weight:bold;font-size:14px}
+  td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}
+  tr:nth-child(even) td{background:var(--paper)}
+
+  .example-artist{display:inline-block;background:var(--paper-2);border:1px solid var(--line);
+    border-radius:20px;padding:2px 12px;font-size:13px;font-family:'Courier New',monospace;
+    color:var(--accent-2);margin:2px 4px 2px 0}
+
+  /* ---------- QUIZ ---------- */
+  .quiz{background:var(--card);border:2px solid var(--accent);border-radius:8px;
+    padding:26px 28px;margin:40px 0 20px;box-shadow:0 4px 16px var(--shadow)}
+  .quiz-head{font-family:'Courier New',monospace;font-size:13px;letter-spacing:2px;
+    text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+  .quiz h3{color:var(--ink);margin-top:4px}
+  .q{margin:22px 0;padding-bottom:20px;border-bottom:1px solid var(--line)}
+  .q:last-of-type{border-bottom:none}
+  .q-text{font-weight:bold;margin-bottom:12px;font-size:16px}
+  .q-opt{display:block;padding:11px 16px;margin:7px 0;background:var(--paper);
+    border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;transition:all .15s;font-size:15px}
+  .q-opt:hover{border-color:var(--accent);background:#fff}
+  .q-opt.selected{border-color:var(--accent);background:rgba(156,43,99,.08)}
+  .q-opt.correct{border-color:var(--ok);background:rgba(47,125,79,.12);color:#1c5233}
+  .q-opt.wrong{border-color:var(--bad);background:rgba(178,58,46,.1);color:#8a2b22}
+  .q-opt.disabled{cursor:default;pointer-events:none}
+  .btn{font-family:'Courier New',monospace;font-size:14px;letter-spacing:1px;text-transform:uppercase;
+    background:var(--accent);color:#fff;border:none;padding:13px 28px;border-radius:var(--radius);
+    cursor:pointer;transition:background .15s;margin-top:8px}
+  .btn:hover{background:#7c2250}
+  .btn.secondary{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  .btn.secondary:hover{background:rgba(156,43,99,.08)}
+  .quiz-result{margin-top:20px;padding:18px;border-radius:var(--radius);font-size:16px;display:none}
+  .quiz-result.show{display:block}
+  .quiz-result.pass{background:rgba(47,125,79,.12);border:1px solid var(--ok);color:#1c5233}
+  .quiz-result.fail{background:rgba(178,58,46,.1);border:1px solid var(--bad);color:#8a2b22}
+
+  .module-footer{display:flex;justify-content:space-between;margin-top:50px;gap:12px}
+
+  /* ---------- WELCOME / HERO ---------- */
+  .hero{
+    text-align:center;padding:64px 34px 56px;margin:0 0 10px;border-radius:10px;
+    background:
+      linear-gradient(180deg,rgba(26,16,50,.78),rgba(44,20,66,.60) 55%,rgba(26,16,50,.82)),
+      url("assets/hero.webp") center/cover no-repeat,
+      linear-gradient(135deg,#2c2358,#7c2a6e 45%,#d4622a 90%);
+    color:#f4ecdf;box-shadow:0 12px 32px rgba(40,20,60,.35);
+  }
+  .hero .kicker{font-family:'Courier New',monospace;letter-spacing:3px;text-transform:uppercase;
+    color:#f0b25c;font-size:13px;margin-bottom:16px}
+  .hero h1{font-size:52px;margin-bottom:16px;color:#fff;text-shadow:0 2px 18px rgba(20,10,40,.55)}
+  .hero h1 em{color:#ffd9a0;font-style:italic}
+  .hero .sub{font-size:20px;color:#eadff2;font-style:italic;max-width:620px;margin:0 auto 10px;
+    text-shadow:0 1px 10px rgba(20,10,40,.5)}
+
+  .intro-quote{background:var(--card);border-left:4px solid var(--gold);
+    border-radius:0 var(--radius) var(--radius) 0;padding:22px 26px;margin:28px 0;
+    font-style:italic;font-size:17px;line-height:1.75;box-shadow:0 2px 8px var(--shadow)}
+  .intro-quote p{margin-bottom:12px}
+  .intro-quote p:last-child{margin-bottom:0}
+
+  .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:36px 0}
+  .feature{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent-2);
+    border-radius:var(--radius);padding:20px;text-align:left;box-shadow:0 2px 8px var(--shadow)}
+  .feature .fnum{font-family:'Courier New',monospace;color:var(--gold);font-size:13px;margin-bottom:6px}
+  .feature h4{font-size:17px;margin-bottom:6px}
+  .feature p{font-size:14px;color:var(--ink-soft);margin:0}
+
+  .reset-link{font-size:12px;color:var(--ink-soft);text-decoration:underline;cursor:pointer;
+    display:inline-block;margin-top:14px;font-family:'Courier New',monospace}
+
+  /* ---------- MOBILE ---------- */
+  .menu-toggle{display:none}
+  @media(max-width:860px){
+    .wrap{flex-direction:column}
+    .sidebar{width:100%;height:auto;position:relative;top:0;
+      border-right:none;border-bottom:1px solid var(--line);display:none}
+    .sidebar.open{display:block}
+    .content{padding:28px 20px 100px;max-width:100%}
+    .menu-toggle{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:20;
+      background:var(--accent);color:#fff;border:none;width:100%;padding:14px 20px;
+      font-family:'Courier New',monospace;letter-spacing:1px;text-transform:uppercase;
+      font-size:13px;cursor:pointer}
+    h1{font-size:30px}.hero h1{font-size:36px}.lede{font-size:17px}
+    h2{font-size:22px}
+    .hero{padding:44px 22px 40px}
+  }
+</style>
+</head>
+<body>
+<button class="menu-toggle" onclick="toggleMenu()">☰ &nbsp;Obsah kurzu</button>
+<div class="wrap">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">Kurz songwritingu</div>
+    <div class="brand-title">Ako písať texty,<br>ktoré <b>znejú</b></div>
+    <div class="progress-box">
+      <div>Tvoj postup: <b id="prog-label">0 / 18 modulov</b></div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+    </div>
+    <nav id="nav"></nav>
+    <span class="reset-link" onclick="resetProgress()">↺ vynulovať postup</span>
+  </aside>
+
+  <main class="content" id="content"></main>
+</div>
+
+<script>
+/* ================= UI REŤAZCE + KONFIG JAZYKA (SK) =================
+   Pre ďalšiu jazykovú mutáciu (CZ) vznikne src/cz/ui.js s rovnakou
+   štruktúrou — app.js v core/ je jazykovo neutrálny a číta len UI/STORE_KEY. */
+
+const STORE_KEY = "kurz_songwritingu_v1";
+
+const UI = {
+  progress: (d, t) => `${d} / ${t} modulov`,
+  quizHead: "Test modulu",
+  quizTitle: "Over si svoje znalosti",
+  quizNeed: (p, t) => `Na dokončenie modulu potrebuješ aspoň ${p} z ${t} správnych odpovedí.`,
+  quizSubmit: "Vyhodnotiť test",
+  quizRetry: "Skúsiť znova",
+  quizAnswerAll: "Odpovedz najprv na všetky otázky.",
+  quizPass: (c, t, hasNext) => `<b>Výborne! ${c}/${t} správne.</b> Modul je dokončený. ${hasNext ? "Môžeš pokračovať ďalej." : ""}`,
+  quizFail: (c, t, p) => `<b>${c}/${t} správne.</b> Potrebuješ aspoň ${p}. Prezri si modul znova a skús to ešte raz — tlačidlo „Skúsiť znova“.`,
+  quizPassShort: (c, t) => `<b>Výborne! ${c}/${t} správne.</b> Modul je dokončený.`,
+  quizFailShort: (c, t, p) => `<b>${c}/${t} správne.</b> Potrebuješ aspoň ${p}. Skús to znova.`,
+  btnPrev: "← Späť",
+  btnNext: "Ďalší modul →",
+  projectDone: "Projekt dokončený ✓",
+  resetConfirm: "Naozaj vynulovať celý postup? Táto akcia sa nedá vrátiť."
+};
+
+/* ================= OBSAH KURZU — ČASŤ 1 (moduly 0–3) ================= */
+
+const MODULES_P1 = [
+{
+  id:"vitaj", group:"Úvod", num:"★", title:"Vitaj v kurze",
+  welcome:true,
+  html:`
+    <div class="hero">
+      <div class="kicker">Songwriting pre slovenčinu · optimalizované pre Suno AI</div>
+      <h1>Ako písať texty,<br>ktoré <em>znejú</em></h1>
+      <p class="sub">Nie „správny“ text, ale text s rytmom, dychom a vnútornou pravdou — a taký, ktorý sa dá zhudobniť bez toho, aby sa slová lámali cez melódiu.</p>
+    </div>
+
+    <div class="intro-quote">
+      <p>Poézia žije na papieri. Môže byť pokojne krivá, tichá, ťažká — číta sa očami, vo vlastnom čase, a dovolí si zastať, kde chce.</p>
+      <p>Próza plynie. Buduje svet vetu za vetou, má priestor sa rozbehnúť, vysvetliť, odbočiť.</p>
+      <p><strong>Text piesne nežije na papieri — žije v čase a v dychu.</strong> Musí sadnúť do melódie, dať sa zaspievať na jeden nádych, zniesť opakovanie a predsa neomrzieť. Tu slovo nevládne samo: slúži zvuku, rytmu a hlasu, ktorý ho ponesie. Krásny verš, ktorý sa láme cez melódiu, je zlý text — aj keby bol dokonalá báseň.</p>
+      <p>Tento kurz je práve o tom prechode: ako premeniť to, čo cítiš, na slová, ktoré <em>znejú</em>.</p>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature"><div class="fnum">01</div><h4>Od základov k praxi</h4><p>Štruktúra, rytmus, rýmy, spievateľnosť — presne to, čo rozhoduje, či sa text dá zhudobniť.</p></div>
+      <div class="feature"><div class="fnum">02</div><h4>Slovenské a české príklady</h4><p>Učíme sa na tvorbe, ktorú poznáš — Kirschner, Müller, Pokáč, Horkýže, Kontrafakt a ďalší.</p></div>
+      <div class="feature"><div class="fnum">03</div><h4>Test po každom module</h4><p>Overíš si, čo si pochopil. Postup sa ti ukladá priamo v prehliadači.</p></div>
+      <div class="feature"><div class="fnum">04</div><h4>Cielené na Suno AI</h4><p>Nielen ako napísať text, ale ako ho pripraviť tak, aby ho hudobný model zaspieval dobre.</p></div>
+    </div>
+
+    <h2>Pre koho je tento kurz</h2>
+    <ul>
+      <li>Pre autorov, ktorí už píšu — básne, denníky, útržky — a chcú, aby sa ich texty dali zhudobniť.</li>
+      <li>Pre začínajúcich textárov, ktorí tvoria po slovensky a hudbu skladajú v Suno AI (alebo to plánujú).</li>
+      <li>Pre každého, kto má čo povedať a chce to povedať tak, aby to obstálo v speve, nie iba na papieri.</li>
+    </ul>
+
+    <h2>Čo potrebuješ vopred</h2>
+    <ul>
+      <li><strong>Chuť písať a prepisovať</strong> — dobrý text vzniká revíziou, nie prvým nápadom.</li>
+      <li><strong>Cit pre slovenčinu</strong> na bežnej úrovni. Žiadna teória verša ani hudobné vzdelanie sa nevyžaduje.</li>
+      <li>Nič viac. Žiadny nástroj, notový zápis ani predchádzajúca skúsenosť.</li>
+    </ul>
+
+    <h2>Čo budeš vedieť po absolvovaní</h2>
+    <ul>
+      <li>Rozoznáš stavbu piesne a vedome ju použiješ — verš, refrén, bridge, intro, outro.</li>
+      <li>Napíšeš text, ktorý sedí do rytmu, dá sa zaspievať a nesie skutočnú emóciu.</li>
+      <li>Odstrániš z textu vatu, klišé aj slovosled ohnutý kvôli rýmu.</li>
+      <li>Pripravíš text pre Suno AI tak, aby ho model zaspieval po slovensky čisto a tak, ako to počuješ v hlave.</li>
+    </ul>
+    <p><strong>Výsledok:</strong> vlastná dokončená pieseň — od nápadu po hotovú skladbu.</p>
+
+    <h2>Ako kurz funguje</h2>
+    <p>Kurz má <strong>18 modulov</strong> vrátane záverečného projektu. Každý modul obsahuje teóriu, konkrétne príklady zo slovenskej a českej scény a na záver krátky test. Odporúčam prechádzať ich v poradí — každý stavia na predchádzajúcom.</p>
+    <p>Tvoj postup sa ukladá automaticky v tomto prehliadači. Keď dokončíš test, modul sa označí zelenou fajkou. Môžeš sa kedykoľvek vrátiť a pokračovať tam, kde si skončil.</p>
+    <div class="callout tip">
+      <div class="callout-label">Ako sa učiť</div>
+      <p style="margin:0">Nečítaj len pasívne. Pri každom module maj po ruke jednu svoju báseň alebo text a skús naň aplikovať, čo sa práve učíš. Songwriting je remeslo — rastie praxou, nie čítaním.</p>
+    </div>
+    <div class="module-footer">
+      <span></span>
+      <button class="btn" onclick="goTo(1)">Začať Modul 1 →</button>
+    </div>
+  `
+},
+{
+  id:"anatomia", group:"Základy štruktúry", num:"1", title:"Anatómia piesne",
+  html:`
+    <div class="eyebrow">Modul 1 · Základy štruktúry</div>
+    <h1>Anatómia piesne</h1>
+    <p class="lede">Skôr než začneme písať, musíme vedieť, z čoho pieseň skladáme. Každá časť má svoju funkciu, miesto a váhu.</p>
+
+    <h2>Základné stavebné bloky</h2>
+    <p>Moderná pieseň — či už pop, rock, folk alebo rap — pracuje s obmedzeným počtom častí. Keď ich raz spoznáš, budeš ich vidieť v každej skladbe, ktorú počuješ.</p>
+
+    <h3>Verš (sloha)</h3>
+    <p>Tu <strong>rozprávame príbeh</strong>. Každá sloha by mala posúvať dej alebo prehlbovať emóciu — nie opakovať to isté inými slovami. Prvá sloha nastoľuje situáciu, druhá ju rozvíja alebo mení perspektívu. Melódia veršov býva pokojnejšia než refrén, aby bol priestor pre text.</p>
+
+    <h3>Refrén (chorus)</h3>
+    <p>Srdce piesne. Opakuje sa, obsahuje hlavnú myšlienku a musí byť <strong>zapamätateľný po prvom vypočutí</strong>. Kľúčové pravidlo: refrén hovorí to isté zakaždým — a práve preto ho ľudia spievajú. Je jednoduchší a údernejší než verš.</p>
+
+    <h3>Pre-chorus (predrefrén)</h3>
+    <p>Nepovinný „mostík napätia“ medzi veršom a refrénom. Zvyšuje energiu, akoby si stúpal po schodoch pred skokom. Veľa piesní ho vynecháva — je to legitímna voľba.</p>
+
+    <h3>Bridge (mostík)</h3>
+    <p>Prichádza zvyčajne raz, po druhom refréne. Prináša <strong>kontrast</strong> — inú melódiu, iný uhol pohľadu, zvrat. V texte to môže byť moment uvedomenia, otočenie príbehu alebo otázka bez odpovede. Bez bridgu pieseň často pôsobí repetitívne.</p>
+
+    <h3>Intro a Outro</h3>
+    <p>Intro naladí poslucháča a vtiahne ho dovnútra — môže byť inštrumentálne alebo textové. Outro uzatvára: môže stíchnuť, zopakovať prvý verš alebo nechať otázku visieť vo vzduchu.</p>
+
+    <h2>Najčastejšie štruktúry</h2>
+    <table>
+      <tr><th>Štruktúra</th><th>Zápis</th><th>Typický žáner</th></tr>
+      <tr><td>Jednoduchá</td><td>V–R–V–R–B–R</td><td>Pop, folk</td></tr>
+      <tr><td>Bez bridgu</td><td>V–R–V–R–R</td><td>Ľahší pop, hymny</td></tr>
+      <tr><td>Rozvinutá</td><td>Intro–V–pC–R–V–pC–R–B–R–Outro</td><td>Rockové balady</td></tr>
+      <tr><td>Rap</td><td>Hook–V–Hook–V–Hook–B–Hook</td><td>Hip-hop</td></tr>
+    </table>
+
+    <div class="callout">
+      <div class="callout-label">Pre Suno AI</div>
+      <p style="margin:0">Jasná a pomenovaná štruktúra funguje najlepšie. Suno číta tagy ako <code>[Verse]</code>, <code>[Chorus]</code>, <code>[Bridge]</code> a podľa nich stavia hudbu. Čím zreteľnejšie označíš časti, tým lepšie model pochopí, kde má stúpať energia.</p>
+    </div>
+
+    <h2>Príklad z praxe</h2>
+    <p>Vezmi si akúkoľvek pieseň Jany Kirschner alebo Pokáča a všimni si vzorec: verš prináša konkrétny obraz a príbeh, refrén ho pretaví do jednej silnej, opakovanej myšlienky, bridge dodá zvrat — a záverečný refrén znie po tom zvrate inak, hoci slová sú rovnaké. Toto je architektúra, ktorú budeme stavať celý kurz.</p>
+    <p>
+      <span class="example-artist">Jana Kirschner</span>
+      <span class="example-artist">Pokáč</span>
+      <span class="example-artist">Miro Žbirka</span>
+      <span class="example-artist">Elán</span>
+    </p>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"Ktorá časť piesne sa opakuje a nesie hlavnú myšlienku?",
+       opts:["Verš","Refrén","Bridge","Intro"],correct:1},
+      {q:"Aká je hlavná úloha bridgu?",
+       opts:["Zopakovať refrén ešte raz","Predstaviť postavu","Priniesť kontrast alebo zvrat","Naladiť atmosféru na začiatku"],correct:2},
+      {q:"Prečo je dôležité pomenovať časti piesne tagmi pre Suno AI?",
+       opts:["Aby text vyzeral profesionálne","Aby model pochopil štruktúru a vedel, kde má stúpať energia","Je to povinné inak Suno nefunguje","Kvôli počtu znakov"],correct:1}
+    ]
+  }
+},
+{
+  id:"intro-nalada", group:"Základy štruktúry", num:"1+", title:"Intro — štyri funkcie",
+  html:`
+    <div class="eyebrow">Modul 1+ · Rozšírenie k anatómii</div>
+    <h1>Intro a jeho štyri funkcie</h1>
+    <p class="lede">Intro je prvý dojem, ktorý rozhoduje. V prvých sekundách naraz nastavuje štyri veci: náladu, hlas, očakávania a tému. Zvládni ich a poslucháč zostane.</p>
+
+    <div class="callout">
+      <div class="callout-label">Štyri funkcie naraz</div>
+      <p style="margin:0">Každé dobré intro súčasne (1) <strong>nastaví náladu</strong>, (2) <strong>predstaví hlas/postavu</strong>, (3) <strong>nastaví očakávania</strong> o žánri a smere, a (4) <strong>naznačí tému</strong> bez toho, aby ju prezradilo. Prejdeme ich po jednej.</p>
+    </div>
+
+    <h2>Funkcia 1 — Nálada</h2>
+    <p>Nálada v intre je súbor konkrétnych nástrojov, ktoré textár vedome volí. Hudba a text pracujú spolu, ale ty ako textár máš kontrolu nad tým, <strong>čo</strong> a <strong>ako</strong> povieš v prvých riadkoch. Tu je päť nástrojov, ktorými sa nálada tvorí.</p>
+    <p>Nálada v intre je súbor konkrétnych nástrojov, ktoré textár vedome volí. Hudba a text pracujú spolu, ale ty ako textár máš kontrolu nad tým, <strong>čo</strong> a <strong>ako</strong> povieš v prvých riadkoch. Tu je päť nástrojov, ktorými sa nálada tvorí.</p>
+
+    <h2>Päť nástrojov nálady</h2>
+    <table>
+      <tr><th>Nástroj</th><th>Ako funguje</th></tr>
+      <tr><td><strong>Zmyslový detail</strong></td><td>Obraz, zvuk, vôňa, dotyk — presunie poslucháča do konkrétneho miesta</td></tr>
+      <tr><td><strong>Voľba slovesa</strong></td><td>Aktívne sloveso = energia; pasívne = stagnácia, ťaživosť</td></tr>
+      <tr><td><strong>Čas a miesto</strong></td><td>Ráno/noc, leto/zima — nesú emóciu samy osebe</td></tr>
+      <tr><td><strong>Dĺžka vety</strong></td><td>Krátke vety = úder, rýchlosť; dlhé = plynutie, melanchólia</td></tr>
+      <tr><td><strong>Zámeno / hlas</strong></td><td>„Ja“ = intímne, osobné; „ty“ = konfrontácia, výzva</td></tr>
+    </table>
+    <p>Nálada vzniká ich <strong>súhrou</strong> — nie jedným trikom, ale kombináciou. Poďme na štyri typické nálady a rozoberme, ako sa stavajú.</p>
+
+    <h2>Melancholická / smutná</h2>
+    <div class="lyric">Ráno. Štvrtok. Na stole tvoj hrnček.</div>
+    <p>Tri slová — a vieš presne kde si, v akom čase, a čo sa stalo. Konkrétny predmet (hrnček) nesie emóciu straty oveľa silnejšie ako priame „chýbaš mi“. Nástroje tu: <strong>čas</strong> (ráno, štvrtok = všednosť smútku), <strong>predmet</strong> (absencia osoby), <strong>krátke vety</strong> (staccato = strnulosť, šok).</p>
+    <p><span class="example-artist">Jana Kirschner</span> stavia intrá práve na konkrétnom obraze namiesto abstraktnej emócie.</p>
+
+    <h2>Vzdorovitá / silná</h2>
+    <div class="lyric">Nebudem čakať. Už nie.</div>
+    <p>Dve vety. Aktívne sloveso, negácia, záverečný úder „Už nie.“ — postoj ešte pred prvým tónom. Nástroje: <strong>krátke vety</strong> (rozhodnosť), <strong>aktívne sloveso</strong> („nebudem“, nie „neviem“), implicitné <strong>ja</strong> ako aktívny hovorca, nie pasívna obeť.</p>
+    <p><span class="example-artist">Horkýže Slíže</span><span class="example-artist">Kontrafakt</span> — energia je prítomná od prvého slova, žiadne rozbiehanie.</p>
+
+    <h2>Hravá / ironická</h2>
+    <div class="lyric">Zase som zabudol. Kvetinu. Výročie. Teba.</div>
+    <p>Gradácia od banálneho k osobnému — a posledné „Teba“ zaklope inak. Poslucháč sa najprv pousmeje, potom cíti viac. Nástroje: <strong>gradácia</strong> (od malého k veľkému), <strong>hovorový jazyk</strong>, <strong>prekvapenie</strong> na konci riadku.</p>
+    <p><span class="example-artist">Pokáč</span><span class="example-artist">Michal Hrůza</span> — hovorovosť, nečakaný zvrat, sebairónia.</p>
+
+    <h2>Atmosferická / obrazová</h2>
+    <div class="lyric">Kde-tu zahasínal posledný teplý deň.</div>
+    <p>Poetickejšie intro — vhodné pre folk alebo singer-songwriter. Nástroje: <strong>metafora</strong> (zahasínal = slnko aj leto aj vzťah, viacvrstvové), <strong>dlhšia veta</strong> (plynutie), <strong>neurčitý čas</strong> („kde-tu“ = niekedy = vždy).</p>
+    <p><span class="example-artist">Miro Žbirka</span><span class="example-artist">Richard Müller</span> — jeden zmyslový obraz, mierne archaickejší jazyk, pocit plynutia času.</p>
+
+    <div class="callout tip">
+      <div class="callout-label">Zlaté pravidlo intra</div>
+      <p style="margin:0">Intro <strong>naznačí, ale neprezradí</strong>. Ak intro povie všetko, verš nemá kam ísť. Nechaj priestor — jeden silný obraz stačí, zvyšok odhalíš postupne.</p>
+    </div>
+
+    <h2>Funkcia 2 — Hlas a postava</h2>
+    <p>„Hlas" je <strong>kto rozpráva</strong> — a intro je prvé miesto, kde ho poslucháč spozná. Ešte skôr, než pochopí, o čom pieseň je, cíti, komu načúva. Rozhodujú tri veci:</p>
+    <ul>
+      <li><strong>Gramatický rod</strong> — slovenčina ho prezradí hneď pri prvom slovese v minulom čase: „Čakala som" (žena) vs. „Nikdy som sa nebál" (muž). Rod textu musí sedieť s rodom plánovaného hlasu v Suno.</li>
+      <li><strong>Register jazyka</strong> — spôsob reči kreslí postavu presnejšie než opis. „Ešte raz sa obzriem" (poetický, citlivý) vs. „Tak som odišiel. Bez rozlúčky." (strohý, mestský) vs. „No a šiel som, čo už" (hovorový, obyčajný človek).</li>
+      <li><strong>Pozícia hovorcu</strong> — Ja→ty (intímne, konfrontačné), Ja→svet (spoveď), rozprávač (odstup, príbeh o niekom inom).</li>
+    </ul>
+    <div class="callout tip">
+      <div class="callout-label">Register = charakter</div>
+      <p style="margin:0">Intro nemá <strong>opísať</strong> postavu („som osamelý tridsiatnik"), ale <strong>dať ju počuť</strong> — jedným slovesom v správnom rode, jedným slovom v správnom registri. Poslucháč si postavu doskladá sám, a práve preto mu prirastie.</p>
+    </div>
+
+    <h2>Funkcia 3 — Očakávania</h2>
+    <p>Intro nastaví, <strong>čo príde a v akom žánri</strong>. Tempo prvého riadku, dĺžka viet, miera hovorovosti — to všetko poslucháčovi napovie, či bude počúvať krehkú baladu alebo energický rock. Toto očakávanie potom pieseň buď naplní, alebo ho zámerne poruší pre efekt (ale porušenie musí byť odôvodnené, nie náhodné).</p>
+    <div class="callout warn">
+      <div class="callout-label">Pozor na rozpor</div>
+      <p style="margin:0">Ak intro nastaví krehké ticho a refrén je vzdorovitý výkrik, ten prechod musí byť zámerný a pripravený veršom — inak to znie ako dve rôzne piesne zlepené dohromady.</p>
+    </div>
+
+    <h2>Funkcia 4 — Náznak témy</h2>
+    <p>Intro má tému <strong>naznačiť, no neprezradiť</strong>. Cieľom je vzbudiť otázku, nie dať odpoveď. Techniky:</p>
+    <ul>
+      <li><strong>Ukáž symptóm, nie diagnózu</strong> — namiesto „pieseň o rozchode" daj „druhý vankúš už týždeň studený". Téma vyplynie sama.</li>
+      <li><strong>Detail s váhou</strong> — jeden predmet, ktorý nesie tému: „kľúč, ktorý už nič neotvára" (strata domova).</li>
+      <li><strong>Nastav scénu, nie záver</strong> — „Kufor pri dverách. Vonku prší." ťahá ďalej; „Nakoniec som odišiel a bolo to správne" zabuchne dvere.</li>
+      <li><strong>Kontrast alebo nezrovnalosť</strong> — „Svadobné šaty v igelite na povale" vytvorí otázku samou zrážkou obrazov.</li>
+    </ul>
+    <div class="callout tip">
+      <div class="callout-label">Pravidlo ľadovca</div>
+      <p style="margin:0">Ukáž desatinu, nechaj deväť desatín pod hladinou. Intro dá detail; verš odhalí kontext; refrén pomenuje emóciu; bridge ju otočí. Po intre má poslucháč vedieť <em>naladiť sa</em> na tému, ale nemá vedieť, ako pieseň dopadne. Ak vie oboje, intro prezradilo priveľa.</p>
+    </div>
+
+    <h2>Časté chyby</h2>
+    <ul>
+      <li><strong>Priveľa informácií naraz.</strong> „Volám sa Ján, mám tridsať, žijem v meste a som sám" — to je životopis, nie intro. Intro je záblesk, nie reportáž.</li>
+      <li><strong>Klišé ako prvý riadok.</strong> „Keď som ťa stretol prvýkrát…" alebo „Život je ako…" — poslucháč vypne skôr, než dobehneš vetu.</li>
+      <li><strong>Prezradená téma.</strong> Ak prvý riadok povie celý príbeh aj jeho koniec, pieseň nemá čo odkrývať.</li>
+    </ul>
+
+    <div class="callout">
+      <div class="callout-label">Pre Suno AI</div>
+      <p style="margin:0">Inštrumentálne intro: tag <code>[Intro]</code> bez textu. Textové intro: riadky priamo pod <code>[Intro]</code>. Hook ako intro: začni rovno tagom <code>[Chorus]</code> — refrén sa potom po verši vráti „naplno“ a znie dôverne, lebo ho poslucháč už raz počul.</p>
+    </div>
+
+    <h2>Z tvorby Leily K — všetky štyri funkcie naraz</h2>
+    <p>Tri reálne intrá od autorky Leily K, každé ťahá inú funkciu:</p>
+
+    <p><strong>Hlas a persona</strong> — „Ahoj, ja som Leila":</p>
+    <div class="lyric">Môžeš ma milovať
+Alebo chcieť zabiť</div>
+    <p>Prvé dva riadky okamžite nastavia polarizujúcu personu — poslucháč hneď vie, komu načúva a že tento hlas nenechá nikoho ľahostajným.</p>
+
+    <p><strong>Náznak témy cez prostredie</strong> — „Dieťa sídliska":</p>
+    <div class="lyric">Na mieste bez ruží, kde kvitol drsný smiech</div>
+    <p>Oxymoron ako vstupný obraz — intro nastaví svet (drsné prostredie) aj tému identity bez toho, aby ju prezradilo. Ruže chýbajú, no niečo predsa „kvitne".</p>
+
+    <p><strong>Nálada</strong> — „Zrkadlá":</p>
+    <div class="lyric">Mám v sebe čudné zrkadlá
+Všetko mi spätne zrkadlia</div>
+    <p>Introspektívny vstup, ktorý hneď nastaví melancholicko-sebakritickú náladu — zrkadlá nevracajú obraz, ale rozsudok.</p>
+    <p><span class="example-artist">Leila K — Ahoj, ja som Leila</span><span class="example-artist">Dieťa sídliska</span><span class="example-artist">Zrkadlá</span></p>
+
+    <div class="callout tip">
+      <div class="callout-label">Cvičenie</div>
+      <p style="margin:0">Vezmi prvý riadok jednej svojej básne a opýtaj sa: Akú náladu nastavuje — vedome, či náhodou? Aký zmyslový detail tam je (a ak žiadny, kde by mohol byť)? Je to aktívna alebo pasívna veta? Kto rozpráva a komu?</p>
+    </div>
+  `,
+  quiz:{
+    pass:3,
+    questions:[
+      {q:"Ktoré sú štyri funkcie intra?",
+       opts:["Rým, rytmus, melódia, tempo","Nálada, hlas/postava, očakávania, náznak témy","Verš, refrén, bridge, outro","Intro, verš, refrén, koniec"],correct:1},
+      {q:"Prečo „Ráno. Štvrtok. Na stole tvoj hrnček.“ funguje ako smutné intro?",
+       opts:["Obsahuje slovo smútok","Konkrétny predmet a čas nesú emóciu straty silnejšie než priama deklarácia","Má dokonalý rým","Je veľmi dlhé"],correct:1},
+      {q:"Ako intro predstavuje hlas alebo postavu?",
+       opts:["Opíše, koľko má rokov a kde býva","Cez gramatický rod, register jazyka a pozíciu hovorcu — dá postavu počuť","Vždy použije zámeno ja","Pomenuje emóciu priamo"],correct:1},
+      {q:"Čo hovorí „pravidlo ľadovca“ pri náznaku témy?",
+       opts:["Téma má byť studená","Ukáž desatinu, zvyšok nechaj pod hladinou — naznač, ale neprezraď","Intro má byť dlhé","Vždy začni refrénom"],correct:1},
+      {q:"Prečo musí rod textu sedieť s rodom hlasu v Suno?",
+       opts:["Nemusí, je to jedno","Lebo slovenčina rod prezradí a nesúlad spôsobí konflikt vo výslovnosti/hlase","Kvôli rýmu","Kvôli tempu"],correct:1}
+    ]
+  }
+},
+{
+  id:"vers", group:"Základy štruktúry", num:"1a", title:"Verš do hĺbky",
+  html:`
+    <div class="eyebrow">Modul 1a · Rozšírenie k anatómii</div>
+    <h1>Verš (sloha) do hĺbky</h1>
+    <p class="lede">Ak je refrén srdcom piesne, verš je jej rozprávač. Tu sa buduje príbeh, kreslí scéna, prehlbuje emócia. Refrén hovorí čo cítime; verš hovorí prečo.</p>
+
+    <h2>Hlavná úloha: posúvať, nie opakovať</h2>
+    <p>Najčastejšia chyba začínajúcich textárov — každá sloha hovorí to isté inými slovami. Dobrý verš vždy <strong>niekam posunie</strong>: pridá detail, zmení uhol, prehĺbi situáciu. Predstav si slohy ako zábery filmu — každý ukazuje niečo nové.</p>
+    <ul>
+      <li><strong>Verš 1</strong> nastoľuje situáciu — kde sme, kto, čo sa deje</li>
+      <li><strong>Verš 2</strong> ide hlbšie — komplikácia, minulosť, nová vrstva, obrat perspektívy</li>
+    </ul>
+    <div class="callout tip">
+      <div class="callout-label">Test výmeny</div>
+      <p style="margin:0">Ak by si mohol verše 1 a 2 vymeniť bez straty zmyslu, druhý nepridal nič nové. Prepíš ho tak, aby posunul dej alebo emóciu ďalej.</p>
+    </div>
+
+    <h2>Verš verzus refrén — iná stavba</h2>
+    <table>
+      <tr><th></th><th>Verš</th><th>Refrén</th></tr>
+      <tr><td>Úloha</td><td>Rozvíjať, rozprávať</td><td>Zhrnúť, udrieť</td></tr>
+      <tr><td>Jazyk</td><td>Detailnejší, konkrétny</td><td>Jednoduchší, priamy</td></tr>
+      <tr><td>Melódia</td><td>Pokojnejšia, priestor pre slová</td><td>Vrcholná, spevná</td></tr>
+      <tr><td>Text</td><td>Mení sa každú slohu</td><td>Opakuje sa (takmer) doslova</td></tr>
+      <tr><td>Obraznosť</td><td>Viac obrazov, scén</td><td>Jedna silná myšlienka</td></tr>
+    </table>
+    <p>Verš znesie viac slov a detailov, lebo melódia je pokojnejšia. Refrén musí byť vzdušnejší — tam sa spieva naplno.</p>
+
+    <h2>Slabičná zhoda — technické jadro</h2>
+    <p>Pre zhudobnenie kľúčové: <strong>zodpovedajúce si verše naprieč slohami musia mať rovnaký počet slabík</strong> (±1). Melódia prvej slohy sa doslova zopakuje na druhej. Ak má prvý riadok Veršu 1 osem slabík a prvý riadok Veršu 2 jedenásť, melódia nesadne.</p>
+    <div class="lyric">Verš 1, riadok 1: Ráno vstávam do tmy (6 slabík)
+Verš 2, riadok 1: Večer líham do tmy (6 slabík) ✓ melódia sadne</div>
+    <p>Postup: napíš Verš 1, spočítaj slabiky po riadkoch, a Verš 2 stavaj na tú istú schému ako na šablónu.</p>
+
+    <h2>Vnútorná stavba slohy</h2>
+    <p>Dobrá sloha má vlastný malý oblúk — smeruje k poslednému riadku, ktorý ju „zaklincuje“ a prepojí do refrénu. Posledný verš slohy je mostík: buď kladie otázku, na ktorú refrén odpovie, alebo vyostrí napätie, ktoré refrén uvoľní.</p>
+
+    <h2>Príklady zo slovenskej tvorby</h2>
+    <p><strong>Miro Žbirka</strong> stavia slohy ako fotografie — každá je jeden konkrétny, zmyslový obraz, a slohy sa radia ako scény. <strong>Jana Kirschner</strong> pracuje s detailom a náznakom, druhá sloha zvyčajne odhalí novú vrstvu. <strong>Peter Bič Project</strong> buduje naratívne slohy s jasným posunom (typické pre folk). <strong>Horkýže Slíže</strong> píšu slohy hutné, hovorové a energické, ale stále s gradáciou k refrénu.</p>
+    <p><span class="example-artist">Miro Žbirka</span><span class="example-artist">Jana Kirschner</span><span class="example-artist">Peter Bič Project</span></p>
+
+    <h2>Z tvorby Leily K — posun a naratívny verš</h2>
+    <p><strong>Gradácia slôh</strong> — „Dievča": šesť strof idyly, siedma prevráti význam. Prvá sloha nastolí obraz:</p>
+    <div class="lyric">Dievča čo rado v tichu sníva,
+Sedáva v tieni pod jabloňou.</div>
+    <p>…a posledný verš celej piesne otočí perspektívu — ukáže, že hovorca nie je to dievča, ale niekto, kto ho pozoruje s odstupom:</p>
+    <div class="lyric">Predstavujem si, že som ona.</div>
+    <p><strong>Naratívny verš (folk)</strong> — „Tulák": rozprávanie s jasným posunom strofa po strofe:</p>
+    <div class="lyric">Bludil som svetom, som túlavý pes
+Včera som spal inde, než budem dnes</div>
+    <p>Verš tu nesie príbeh aj charakter naraz — prirovnanie „túlavý pes" nie je romantizácia, ale trpká sebakritika, ktorá popiera slobodu tuláctva.</p>
+    <p><span class="example-artist">Leila K — Dievča</span><span class="example-artist">Tulák</span></p>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"Aká je hlavná úloha verša?",
+       opts:["Opakovať hlavnú myšlienku","Posúvať dej alebo prehlbovať emóciu, nie opakovať","Byť jednoduchší než refrén","Držať dlhé tóny"],correct:1},
+      {q:"Čo overuje „test výmeny“ dvoch slôh?",
+       opts:["Či majú rovnaký rým","Či sa dajú vymeniť bez straty zmyslu — ak áno, druhá nepridala nič nové","Či majú rovnakú melódiu","Či sú rovnako dlhé"],correct:1},
+      {q:"Prečo musia mať zodpovedajúce verše naprieč slohami rovnaký počet slabík?",
+       opts:["Kvôli rýmu","Lebo melódia prvej slohy sa doslova zopakuje na druhej","Je to gramatické pravidlo","Kvôli Suno tagom"],correct:1}
+    ]
+  }
+},
+{
+  id:"refren", group:"Základy štruktúry", num:"1b", title:"Refrén do hĺbky",
+  html:`
+    <div class="eyebrow">Modul 1b · Rozšírenie k anatómii</div>
+    <h1>Refrén do hĺbky — čo ho robí silným</h1>
+    <p class="lede">Refrén je časť, ktorú si ľudia pamätajú, spievajú v aute a hučia si týždeň po vypočutí. Ak pieseň uspeje alebo zlyhá, väčšinou sa to rozhodne práve tu.</p>
+
+    <h2>Jednoduchosť je sila</h2>
+    <p>Základné pravidlo: <strong>refrén je jednoduchší a údernejší než verš.</strong> Verš znesie detail a viac slov — refrén nie. Tu sa spieva naplno, melódia je vrcholná, text musí byť vzdušný. Refrén nesie <strong>jednu myšlienku, jeden pocit</strong>, nie tri.</p>
+    <div class="callout tip">
+      <div class="callout-label">Protiintuitívne pravidlo</div>
+      <p style="margin:0">Začiatočníci pchajú do refrénu najviac myšlienok, lebo ho cítia ako najdôležitejší. Opak je pravda — čím menej, tým silnejšie. Verš buduje, refrén zhŕňa.</p>
+    </div>
+
+    <h2>Zapamätateľnosť po prvom vypočutí</h2>
+    <ul>
+      <li><strong>Opakovanie</strong> — refrén sa opakuje takmer doslova zakaždým, často aj kľúčová fráza vnútri refrénu</li>
+      <li><strong>Hook</strong> — jedna chytľavá fráza, ktorá sa vryje; býva to názov piesne alebo jej emocionálne jadro</li>
+      <li><strong>Kontrast s veršom</strong> — refrén melodicky stúpa oproti pokojnejšiemu veršu; ten skok = emocionálny vrchol</li>
+    </ul>
+
+    <h2>Emocionálny vrchol — priama emócia je povolená</h2>
+    <p>Refrén je miesto, kam smeruje celá sloha. Preto tu <strong>funguje aj priama deklarácia emócie</strong>, ktorá by v slohe pôsobila lacno. To, čo je v slohe zakázané („chýbaš mi“), môže byť v refréne úderom — ak ho sloha dobre pripravila. Refrén si tú priamosť <em>zaslúžil</em> budovaním vo verši.</p>
+
+    <h2>Spevnosť a otvorené samohlásky</h2>
+    <p>Keďže sa refrén spieva naplno a drží dlhé tóny, fungujú tu lepšie <strong>otvorené samohlásky</strong> (á, ó, é) na koncoch a vrcholoch — dajú sa natiahnuť. Zatvorený, useknutý koniec sa v refréne drží ťažko.</p>
+
+    <h2>Rovnaký text, iný význam</h2>
+    <p>Majstrovský trik: refrén sa opakuje <strong>doslova</strong>, ale po bridgi znie <strong>inak</strong>, lebo sa zmenil kontext. Rovnaké slová, iná emócia. Nič neprepíšeš, a predsa posledný refrén zasiahne najsilnejšie.</p>
+
+    <h2>Záverečný refrén — najsilnejší zo všetkých</h2>
+    <p>Posledný refrén je to, čo poslucháčovi zostane. Mal by byť vrchol celej piesne — nie len ďalšie zopakovanie. A často má rovnaký text ako predošlé, a predsa musí zasiahnuť najviac. Tu je ako na to:</p>
+    <ul>
+      <li><strong>Nechaj to spraviť bridge.</strong> Najsilnejší nástroj nie je v refréne, ale v tom, čo mu predchádza. Bridge zmení kontext a tie isté slová po ňom znejú inak — prehra ako zmierenie, výčitka ako odpustenie. Píš bridge s cieľom <em>nabiť</em> finálny refrén.</li>
+      <li><strong>Zmeň jeden kľúčový riadok.</strong> Nie celý refrén — len posledný riadok alebo jedno slovo, ktoré posunie význam. „Možno sa vrátiš, možno nie" → v závere „Už sa nevrátiš. A je to tak." Funguje ako rozuzlenie.</li>
+      <li><strong>Priprav holý moment pred ním.</strong> Krátky, obnažený riadok alebo ticho tesne pred posledným refrénom — a ten potom vybuchne s plnou silou.</li>
+      <li><strong>Vygraduj poslednú frázu.</strong> Úplne posledný riadok si zaslúži pozornosť: stíšenie do náznaku, vrchol na najsilnejšom slove, alebo otvorený obraz, čo znie ešte po doznení.</li>
+    </ul>
+    <div class="callout">
+      <div class="callout-label">Pre Suno AI — gradácia záveru</div>
+      <p style="margin:0">Zdvojenie: uveď <code>[Chorus]</code> na konci dvakrát za sebou. Ad-lib vrstvy: doplnkové vokály cez zátvorky <code>(už nie)</code>, ktoré sa vždy spievajú. Emotion tag pred posledný refrén (<code>[Powerful]</code>, <code>[Triumphant]</code> alebo <code>[Tender]</code>) nasmeruje dynamiku. Ukonči <code>[Outro]</code> alebo <code>[Fade Out]</code>, nech sa skladba nezacyklí.</p>
+    </div>
+    <div class="callout tip">
+      <div class="callout-label">Zlaté pravidlo záveru</div>
+      <p style="margin:0">Záverečný refrén nie je silnejší preto, že pridáš viac slov — ale preto, že <strong>celá pieseň mu dala váhu</strong>. Bridge zmenil kontext, oblúk dospel k rozuzleniu, napätie sa uvoľnilo. Tvoja práca je pripraviť cestu, aby tie isté slová dopadli naplno.</p>
+    </div>
+
+    <h2>Príklady zo slovenskej/českej tvorby</h2>
+    <p><strong>Jana Kirschner</strong> — refrény na jednoduchosti a jednej silnej emócii, vzdušné a spevné. <strong>Pokáč</strong> — refrén okolo jasného hooku s hravým obratom, ktorý je pointa aj chytľavá fráza. <strong>Horkýže Slíže</strong> — hymnické refrény na hromadné spievanie. <strong>Elán</strong> — refrény, ktoré zľudoveli vďaka melodickej jasnosti a textovej úspornosti.</p>
+    <p><span class="example-artist">Jana Kirschner</span><span class="example-artist">Pokáč</span><span class="example-artist">Elán</span></p>
+
+    <h2>Z tvorby Leily K — úderný refrén a refrén-pointa</h2>
+    <p><strong>Jednoduchý úderný refrén</strong> — „Zapletený do teba":</p>
+    <div class="lyric">Som do teba zapletený
+Nelákajú ma iné ženy</div>
+    <p>Čistý, opakovaný, zapamätateľný refrén s priamou emóciou — kontrast poetického verša a hovorovejšieho, údernejšieho refrénu.</p>
+    <p><strong>Refrén ako pointa</strong> — „Štyri hlavy":</p>
+    <div class="lyric">Dve ruky a jedna hlava
+Môj deň ako horská dráha</div>
+    <p>Refrén unesie vtip aj úprimnosť naraz — „horská dráha" je obraz dňa plného výkyvov a zároveň hravé priznanie preťaženia.</p>
+    <p><span class="example-artist">Leila K — Zapletený do teba</span><span class="example-artist">Štyri hlavy</span></p>
+
+    <div class="callout warn">
+      <div class="callout-label">Časté chyby</div>
+      <p style="margin:0">Preplnenie myšlienkami · refrén zložitejší než verš · refrén, ktorý sa mení každú opakovačku (poslucháč nemá čo chytiť) · refrén bez kontrastu s veršom (chýba emocionálny skok).</p>
+    </div>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"Aký má byť refrén oproti veršu?",
+       opts:["Zložitejší a detailnejší","Jednoduchší a údernejší","Dlhší","S viacerými myšlienkami"],correct:1},
+      {q:"Prečo je v refréne povolená priama emócia („chýbaš mi“), ktorá by v slohe pôsobila lacno?",
+       opts:["Refrén nemá pravidlá","Lebo ju sloha pripravila — refrén si tú priamosť zaslúžil budovaním","Lebo sa opakuje","Kvôli melódii"],correct:1},
+      {q:"Čo znamená „rovnaký text, iný význam“ pri refréne?",
+       opts:["Refrén sa prepisuje","Refrén sa opakuje doslova, ale po bridgi znie inak vďaka zmenenému kontextu","Každý refrén je iný","Mení sa melódia"],correct:1},
+      {q:"Aké samohlásky fungujú lepšie na vrcholoch refrénu?",
+       opts:["Zatvorené a useknuté","Otvorené (á, ó, é), ktoré sa dajú natiahnuť","Nezáleží na tom","Iba i, y"],correct:1},
+      {q:"Čím sa dá záverečný refrén spraviť najsilnejším bez prepísania textu?",
+       opts:["Pridaním nových slov","Bridgeom, ktorý zmení kontext — tie isté slová potom znejú inak","Zrýchlením tempa","Vynechaním refrénu"],correct:1}
+    ]
+  }
+},
+{
+  id:"bridge", group:"Základy štruktúry", num:"1c", title:"Bridge do hĺbky",
+  html:`
+    <div class="eyebrow">Modul 1c · Rozšírenie k anatómii</div>
+    <h1>Bridge (mostík) do hĺbky</h1>
+    <p class="lede">Bridge je moment, keď pieseň na chvíľu opustí zabehnutú cestu. Prichádza raz, zvyčajne po druhom refréne, a jeho úlohou je priniesť zlom — nie zopakovať to, čo už zaznelo.</p>
+
+    <h2>Prečo bridge existuje</h2>
+    <p>Po dvoch slohách a dvoch refrénoch hrozí, že pieseň začne pôsobiť repetitívne. Bridge je <strong>úľava od opakovania</strong> — prináša novú melódiu, iný uhol pohľadu, prekvapenie. Vďaka nemu záverečný refrén zaznie svieže, hoci je to ten istý text.</p>
+
+    <h2>Čo prináša dobrý bridge</h2>
+    <ul>
+      <li><strong>Zmenu perspektívy</strong> — zrazu hovorí druhá strana, alebo hovorca vidí situáciu inak</li>
+      <li><strong>Priznanie alebo uvedomenie</strong> — moment pravdy, ktorý sa dovtedy skrýval</li>
+      <li><strong>Otočku</strong> — dej alebo emócia sa zlomí opačným smerom</li>
+      <li><strong>Otázku bez odpovede</strong> — napätie, ktoré finálny refrén ponesie ďalej</li>
+    </ul>
+    <div class="callout warn">
+      <div class="callout-label">Čo bridge NIE je</div>
+      <p style="margin:0">Nie je to tretia sloha ani zopakovaný refrén inými slovami. Ak bridge iba pokračuje v tom istom tóne a myšlienke, pieseň oň nič nezíska. Musí <strong>zlomiť</strong>, nie predĺžiť.</p>
+    </div>
+
+    <h2>Hudobný kontrast</h2>
+    <p>Bridge sa zvyčajne líši aj melodicky a harmonicky — inou tóninou, iným rytmom, stíšením alebo naopak vygradovaním. Textovo to podpor tým, že zmeníš dĺžku veršov alebo register jazyka oproti slohám. Ten kontrast je celý zmysel bridgu.</p>
+
+    <h2>Umiestnenie a dĺžka</h2>
+    <p>Štandardné miesto: <strong>po druhom refréne, pred záverečným refrénom</strong> (V–R–V–R–<strong>B</strong>–R). Býva kratší než sloha — často polovičný. Jeho sila je v koncentrácii: pár veršov, ktoré otočia celú pieseň.</p>
+
+    <h2>Príklady zo slovenskej/českej tvorby</h2>
+    <p>V baladách <strong>Richarda Müllera</strong> či <strong>Mira Žbirku</strong> býva bridge momentom stíšenia a priznania — pieseň sa na chvíľu obnaží. V rocku (<strong>Horkýže Slíže</strong>, <strong>Iné Kafe</strong>) je bridge často dynamický zlom — zmena tempa alebo energie pred posledným náporom refrénu.</p>
+    <p><span class="example-artist">Richard Müller</span><span class="example-artist">Miro Žbirka</span><span class="example-artist">Iné Kafe</span></p>
+
+    <h2>Z tvorby Leily K — gradácia a anafora k zlomu</h2>
+    <p><strong>Reflexívny obrat a gradácia k pointe</strong> — „Je čas": séria otázok vrcholí úderným záverom:</p>
+    <div class="lyric">Keď všetky farby zblednú
+Dozrie jablko v nás
+
+Je čas</div>
+    <p>Po trinástich riadkoch otázok „Koľko?" prichádza dvojslovná odpoveď ako úder zvona — presne tá funkcia zlomu, ktorú bridge nesie.</p>
+    <p><strong>Anaforická stavba</strong> — „Vzal to čas": opakované „Pýtam sa…" buduje oblúk k odcudzeniu:</p>
+    <div class="lyric">Pýtam sa vetra
+Čo v konároch praská
+Kam zmizla mladosť
+A s ňou naša láska</div>
+    <p>Anafora je tu štruktúrny princíp — každá strofa oslovuje iný prvok krajiny a všetky smerujú k tomu istému zlomu: k strate.</p>
+    <p><span class="example-artist">Leila K — Je čas</span><span class="example-artist">Vzal to čas</span></p>
+
+    <div class="callout">
+      <div class="callout-label">Pre Suno AI</div>
+      <p style="margin:0">Označ bridge tagom <code>[Bridge]</code>. Suno mu zvyčajne dá odlišnú melódiu a dynamiku oproti veršu a refrénu — presne ten kontrast, ktorý bridge potrebuje. Ak chceš stíšenie, pomôže emotion tag ako <code>[Tender]</code> pred bridge.</p>
+    </div>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"Aká je hlavná úloha bridgu?",
+       opts:["Zopakovať refrén","Priniesť zlom — zmenu perspektívy, priznanie alebo otočku","Predĺžiť pieseň","Zhrnúť slohy"],correct:1},
+      {q:"Kde sa bridge zvyčajne nachádza?",
+       opts:["Na začiatku piesne","Po druhom refréne, pred záverečným refrénom","Medzi veršom a refrénom vždy","Na úplnom konci"],correct:1},
+      {q:"Čo bridge NIE je?",
+       opts:["Zlom v piesni","Tretia sloha alebo zopakovaný refrén inými slovami","Zmena perspektívy","Moment uvedomenia"],correct:1}
+    ]
+  }
+},
+{
+  id:"prechorus-outro", group:"Základy štruktúry", num:"1d", title:"Pre-chorus a Outro",
+  html:`
+    <div class="eyebrow">Modul 1d · Rozšírenie k anatómii</div>
+    <h1>Pre-chorus a Outro — pomocné časti</h1>
+    <p class="lede">Nie sú povinné, ale keď ich použiješ dobre, pozdvihnú pieseň. Pre-chorus buduje napätie pred refrénom, outro rozhoduje o poslednom dojme.</p>
+
+    <h2>Pre-chorus (predrefrén)</h2>
+    <p>Pre-chorus je <strong>most napätia</strong> medzi veršom a refrénom. Jeho úlohou je zdvihnúť energiu, akoby si stúpal po schodoch pred skokom, aby refrén dopadol s plnou silou. Keď verš plynie pokojne a refrén má vybuchnúť, pre-chorus je ten rozbeh.</p>
+    <h3>Ako ho napísať</h3>
+    <ul>
+      <li><strong>Gradácia</strong> — kratšie verše, stúpajúca melódia, rastúce napätie</li>
+      <li><strong>Rovnaký text zakaždým</strong> — na rozdiel od verša sa pre-chorus zvyčajne opakuje ako refrén</li>
+      <li><strong>Smerovanie k refrénu</strong> — posledný riadok často doslova „otvorí dvere“ do refrénu</li>
+    </ul>
+    <div class="lyric">Verš (pokojný) →
+Pre-chorus (stúpa napätie): „A už to cítim, už to ide…“ →
+Refrén (výbuch)</div>
+    <div class="callout tip">
+      <div class="callout-label">Kedy ho použiť</div>
+      <p style="margin:0">Ak refrén dopadá „naplocho“, často chýba práve pre-chorus, ktorý by naň vybudoval rozbeh. Ak pieseň funguje bez neho, nevnucuj ho — je to nástroj, nie povinnosť.</p>
+    </div>
+
+    <h2>Outro (záver)</h2>
+    <p>Outro rozhoduje o poslednom dojme — o tom, čo poslucháčovi ostane, keď dozneje posledný tón. Má niekoľko osvedčených podôb:</p>
+    <ul>
+      <li><strong>Doznievanie</strong> — opakovanie časti refrénu, ktoré postupne stíchne (fade out)</li>
+      <li><strong>Návrat na začiatok</strong> — zopakovanie prvého verša, ktoré uzavrie kruh; po celej piesni znie inak</li>
+      <li><strong>Posledný obraz</strong> — jeden nový verš, ktorý necháš visieť vo vzduchu ako pointu</li>
+      <li><strong>Otvorený koniec</strong> — otázka alebo nedopovedaná myšlienka, ktorá poslucháča necháva rozmýšľať</li>
+    </ul>
+
+    <h2>Príklady</h2>
+    <p>Pop a rock (<strong>Jana Kirschner</strong>, <strong>Elán</strong>) často používajú doznievajúci refrén ako outro — pieseň sa vytráca s hlavnou frázou. Baladickí autori (<strong>Richard Müller</strong>) radi uzavrú kruh návratom na úvodný obraz alebo posledným tichým veršom.</p>
+    <p><span class="example-artist">Jana Kirschner</span><span class="example-artist">Elán</span><span class="example-artist">Richard Müller</span></p>
+
+    <div class="callout">
+      <div class="callout-label">Pre Suno AI</div>
+      <p style="margin:0">Pre-chorus označ <code>[Pre-Chorus]</code> — Suno mu dá stúpajúcu dynamiku. Outro označ <code>[Outro]</code>, alebo <code>[Fade Out]</code> pre doznievanie. Ak skladba „nechce skončiť“ a opakuje sa donekonečna, pomôže jasný tag <code>[End]</code>.</p>
+    </div>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"Aká je úloha pre-chorusu?",
+       opts:["Zhrnúť pieseň","Budovať napätie a rozbeh pred refrénom, aby dopadol naplno","Nahradiť bridge","Predstaviť postavu"],correct:1},
+      {q:"Čím sa pre-chorus líši od verša?",
+       opts:["Je dlhší","Zvyčajne sa opakuje rovnako zakaždým (ako refrén), nemení sa","Nemá melódiu","Je vždy na začiatku"],correct:1},
+      {q:"Ktoré je osvedčené riešenie outra?",
+       opts:["Pridať nový refrén s iným textom","Návrat na úvodný obraz, ktorý uzavrie kruh","Zrýchliť tempo","Zopakovať celú prvú slohu"],correct:1},
+      {q:"Ktorý Suno tag pomôže, ak sa skladba opakuje donekonečna?",
+       opts:["[Intro]","[End] alebo [Fade Out]","[Verse]","[Pre-Chorus]"],correct:1}
+    ]
+  }
+},
+
+{
+  id:"rytmus", group:"Základy štruktúry", num:"2", title:"Rytmus a metrum",
+  html:`
+    <div class="eyebrow">Modul 2 · Základy štruktúry</div>
+    <h1>Rytmus a metrum textu</h1>
+    <p class="lede">Toto je najčastejší dôvod, prečo sa báseň zle zhudobňuje. Nie obsah — rytmus. Ak text nemá pravidelný spád, melódia sa oň potkýna.</p>
+
+    <h2>Slabika je základná jednotka</h2>
+    <p>Hudba beží v pravidelných dobách. Text musí do týchto dôb zapadnúť. Základná jednotka, ktorou to meriame, je <strong>slabika</strong>. Keď majú zodpovedajúce si verše naprieč slohami rovnaký počet slabík, melódia jednej slohy sadne aj na druhú.</p>
+
+    <div class="callout">
+      <div class="callout-label">Slovenské špecifikum — slabikovanie</div>
+      <p style="margin:0 0 8px">Pri počítaní slabík v slovenčine pozor na:</p>
+      <ul style="margin:0 0 0 20px">
+        <li><strong>Dvojhlásky</strong> (ia, ie, iu, ô) = <strong>1 slabika</strong>: „viera“ = vie-ra = 2 slabiky</li>
+        <li><strong>Slabikotvorné r/ŕ/l/ĺ</strong> = samostatná slabika: „vlk“ = 1 slabika, „štvrť“ = 1 slabika, „mŕtvy“ = mŕ-tvy = 2</li>
+        <li><strong>Predložka + slovo</strong> = jeden prízvukový takt: „na stole“ znie ako jeden celok</li>
+      </ul>
+    </div>
+
+    <h2>Prízvuk padá na prvú slabiku</h2>
+    <p>Toto je <strong>kľúčové pravidlo slovenčiny</strong>. V slovenčine prízvuk takmer vždy padá na <strong>prvú slabiku slova</strong>. Angličtina to má inak (guitar → gui-<em>TAR</em>), a preto anglické pesničkové vzorce často v slovenčine „nesadnú“.</p>
+    <p>Keď píšeš text, rytmický dôraz melódie by mal padať tam, kde reálne padá prízvuk. Ak dáš prízvučnú dobu na neprízvučnú slabiku, spevák to buď „zláme“, alebo to znie neprirodzene.</p>
+
+    <div class="lyric">MÁ-ma VA-rí, DE-ti SPÍ-a
+(prízvuk na prvej slabike každého slova — prirodzené)
+
+vs.
+
+ma-MA va-RÍ (nesprávne posunutý dôraz — „škrípe“)</div>
+
+    <h2>Príklonky — zákerná pasca</h2>
+    <p>Príklonky sú krátke neprízvučné slová: <em>sa, si, ma, mi, mu, ho, ju, ti, ťa, som, si, je…</em> Sú <strong>neprízvučné</strong> a v slovenskej vete stoja na <strong>druhej pozícii</strong>. Nikdy ich nedávaj na metricky silnú (prízvučnú) pozíciu — spevák by na nich musel urobiť dôraz, čo znie cudzo.</p>
+
+    <div class="callout warn">
+      <div class="callout-label">Pozor</div>
+      <p style="margin:0">„<em>Sa</em> mi to páči“ na začiatku verša je chyba — príklonka „sa“ nepatrí na prvú, silnú pozíciu. Správne: „Páči <em>sa</em> mi to“. Toto je jedna z najčastejších chýb pri zhudobňovaní.</p>
+    </div>
+
+    <h2>Metrum — pravidelné striedanie</h2>
+    <p>Metrum je vzorec striedania prízvučných a neprízvučných slabík. V slovenčine sú najprirodzenejšie:</p>
+    <table>
+      <tr><th>Metrum</th><th>Vzorec</th><th>Charakter</th></tr>
+      <tr><td>Trochej</td><td>PRÍ-zvuk-ne, PRÍ-zvuk-ne</td><td>Najprirodzenejší pre SJ (prízvuk vpredu)</td></tr>
+      <tr><td>Daktyl</td><td>PRÍ-zvuk-ne-ne</td><td>Spevný, tanečný, ľudový</td></tr>
+      <tr><td>Jamb</td><td>ne-PRÍ-zvuk</td><td>Ťažší pre SJ, treba obozretne</td></tr>
+    </table>
+    <p>Nemusíš si to pamätať názvami. Stačí, ak vieš: <strong>slovenčina prirodzene tečie s dôrazom na začiatku slov</strong>, takže trochejský spád je tvoj domovský terén.</p>
+
+    <div class="callout tip">
+      <div class="callout-label">Praktický test</div>
+      <p style="margin:0">Prečítaj verš nahlas ako obyčajnú vetu. Kde ti padne dôraz prirodzene, tam by mal padnúť aj v speve. Ak musíš „nasilu“ prízvukovať inak, aby to sadlo do rytmu — prepíš verš.</p>
+    </div>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"Koľko slabík má slovo „viera“?",
+       opts:["1 (vie-ra je dvojhláska)","2 (vie-ra)","3 (vi-e-ra)","závisí od výslovnosti"],correct:1},
+      {q:"Na ktorú slabiku padá v slovenčine prízvuk?",
+       opts:["Na poslednú","Na predposlednú","Na prvú","Mení sa podľa slova"],correct:2},
+      {q:"Kde NEMÁ stáť príklonka „sa“?",
+       opts:["Na druhej pozícii vo vete","Na prvej, prízvučnej pozícii verša","Uprostred vety","Za slovesom"],correct:1},
+      {q:"Ktoré metrum je najprirodzenejšie pre slovenčinu?",
+       opts:["Jamb","Trochej","Anapest","Žiadne"],correct:1}
+    ]
+  }
+},
+{
+  id:"rymy", group:"Zvuk a jazyk", num:"3", title:"Rýmy a ich rozmiestnenie",
+  html:`
+    <div class="eyebrow">Modul 3 · Zvuk a jazyk</div>
+    <h1>Rýmy a ich rozmiestnenie</h1>
+    <p class="lede">Rým nie je ozdoba — je to zvukové lepidlo, ktoré drží verše pohromade a robí ich zapamätateľnými. Ale zlý rým dokáže pieseň zabiť rýchlejšie než čokoľvek iné.</p>
+
+    <h2>Rýmové schémy</h2>
+    <p>Schéma opisuje, ktoré verše sa rýmujú. Označujeme ich písmenami — rovnaké písmeno = rovnaký rým.</p>
+    <table>
+      <tr><th>Schéma</th><th>Vzorec</th><th>Efekt</th></tr>
+      <tr><td>Združený</td><td>A–A–B–B</td><td>Jednoduchý, ľudový, spevný</td></tr>
+      <tr><td>Striedavý</td><td>A–B–A–B</td><td>Elegantný, drží napätie dlhšie</td></tr>
+      <tr><td>Obkročný</td><td>A–B–B–A</td><td>Uzavretý, baladický</td></tr>
+      <tr><td>Bez rýmu</td><td>voľný verš</td><td>Moderný, spolieha sa na rytmus</td></tr>
+    </table>
+
+    <h2>Čistý rým vs. asonancia</h2>
+    <p>Nie každý rým musí byť dokonalý. Práveže — v slovenčine je často <strong>lepšie použiť neúplný rým</strong> než ohnúť vetu do nemožnej podoby kvôli dokonalému rýmu.</p>
+    <ul>
+      <li><strong>Čistý (plný) rým</strong> — zhoduje sa celá koncovka: <em>ruka – muka</em>, <em>nebo – bez teba</em></li>
+      <li><strong>Asonancia</strong> — zhodujú sa len samohlásky: <em>rána – tráva</em>, <em>domov – kroky</em>. Znie mäkšie, prirodzenejšie, moderne.</li>
+    </ul>
+
+    <div class="callout tip">
+      <div class="callout-label">Zlaté pravidlo</div>
+      <p style="margin:0">Lepší je čistý asonančný rým než dokonalý rým, ktorý zdeformuje vetu. Rýmuj <strong>významovo nosné slová</strong>, nie spojky a výplne.</p>
+    </div>
+
+    <h2>Gramatický rým — čoho sa vyhnúť</h2>
+    <p>Najlacnejší a najnudnejší typ rýmu je <strong>gramatický rým</strong> — keď rýmuješ rovnaké gramatické koncovky: <em>milovať – bozkávať – spievať</em> alebo <em>radosti – mladosti – starosti</em>. Znie to ako cvičenie zo slovníka, nie ako pieseň.</p>
+
+    <div class="callout warn">
+      <div class="callout-label">Vyhni sa</div>
+      <p style="margin:0">Rýmom typu „-osti/-nosti“, „-uje/-uje“, „-ého/-ého“. Sú predvídateľné a prezrádzajú, že si šiel po najľahšej ceste. Namiesto toho hľadaj rým medzi <em>rôznymi</em> slovnými druhmi — podstatné meno so slovesom, to prekvapí.</p>
+    </div>
+
+    <h2>Vata — nepriateľ číslo jedna</h2>
+    <p><strong>Vata</strong> je výplňové slovo, ktoré tam dáš len preto, aby ti sedel počet slabík alebo rým. „A ja teda vlastne naozaj…“ — každé z týchto slov možno škrtnúť bez straty významu. Ak potrebuješ vatu, aby verš „vyšiel“, <strong>prepíš celý verš</strong>, nedávaj výplň.</p>
+
+    <div class="lyric">Zlé (s vatou):
+„A ja len tak nejako stále čakám na teba“
+
+Lepšie (bez vaty):
+„Stále čakám. Na teba.“</div>
+
+    <h2>Rozmiestnenie rýmov v piesni</h2>
+    <p>Rým nemusí byť len na konci verša. Skúsení textári používajú aj:</p>
+    <ul>
+      <li><strong>Vnútorný rým</strong> — rým vnútri jedného verša: „<em>V tme sa mi zdá, že si tu zas</em>“</li>
+      <li><strong>Refrénový rým</strong> — silnejší, výraznejší v refréne než vo veršoch</li>
+      <li><strong>Zámerná absencia</strong> — vynechať očakávaný rým pre efekt prekvapenia alebo dôrazu</li>
+    </ul>
+    <p>
+      <span class="example-artist">Kontrafakt (vnútorné rýmy)</span>
+      <span class="example-artist">Pokáč (hravé rýmy)</span>
+      <span class="example-artist">Richard Müller (asonancia)</span>
+    </p>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"Ktorá rýmová schéma je združená?",
+       opts:["A–B–A–B","A–A–B–B","A–B–B–A","voľný verš"],correct:1},
+      {q:"Čo je asonancia?",
+       opts:["Dokonalý rým celej koncovky","Rým, kde sa zhodujú len samohlásky","Rým na začiatku verša","Rým medzi rovnakými slovami"],correct:1},
+      {q:"Prečo sa vyhýbame gramatickému rýmu (napr. radosti – mladosti)?",
+       opts:["Je gramaticky nesprávny","Je predvídateľný a lacný, znie ako zoznam koncoviek","Nedá sa zaspievať","Suno ho nečíta"],correct:1},
+      {q:"Čo je „vata“ v texte?",
+       opts:["Druh refrénu","Výplňové slovo pridané len kvôli počtu slabík alebo rýmu","Vnútorný rým","Metafora"],correct:1}
+    ]
+  }
+}
+];
+
+/* ================= OBSAH KURZU — ČASŤ 2 (moduly 4–7) ================= */
+
+const MODULES_P2 = [
+{
+  id:"melodia", group:"Zvuk a jazyk", num:"4", title:"Melódia a slovenčina",
+  html:`
+    <div class="eyebrow">Modul 4 · Zvuk a jazyk</div>
+    <h1>Prirodzenosť melódie na slovách</h1>
+    <p class="lede">Text a melódia musia dýchať spolu. Keď sa slovo „láme“ cez melódiu, poslucháč to cíti, aj keď nevie pomenovať prečo.</p>
+
+    <h2>Zvuk pred významom — na úrovni verša</h2>
+    <p>Toto je najdôležitejší princíp celého kurzu. <strong>Každý verš sa musí dať vysloviť na jeden nádych a prirodzene plynúť.</strong> Ak verš „škrípe“ v ústach, prepíš ho — aj keby bol významovo dokonalý.</p>
+    <div class="callout">
+      <div class="callout-label">Test jedného nádychu</div>
+      <p style="margin:0">Povedz si verš nahlas. Zakoktal by sa pri ňom spevák? Musí sa nadýchnuť uprostred? Ak áno, verš je príliš dlhý alebo má zlý spád. Refrénový riadok by mal ísť na jeden nádych — orientačne do 12 slabík.</p>
+    </div>
+
+    <h2>Otvorené vs. zatvorené samohlásky</h2>
+    <p>Spevák „drží“ tóny na samohláskach, nie na spoluhláskach. Preto <strong>na koncoch veršov a na dlhých tónoch fungujú lepšie otvorené samohlásky</strong> (á, ó, é), ktoré sa dajú pekne natiahnuť.</p>
+    <ul>
+      <li>„…a zostáva ti len <strong>tmá</strong>“ — dá sa krásne natiahnuť</li>
+      <li>„…a zostáva ti len <strong>tíš</strong>“ — na „š“ sa tón držať nedá, koniec pôsobí useknuto</li>
+    </ul>
+    <p>Nie je to zákaz — je to nástroj. Zatvorený, useknutý koniec sa dá použiť <em>zámerne</em> pre pocit tvrdosti alebo prerušenia.</p>
+
+    <h2>Zhluky spoluhlások — brzda spievateľnosti</h2>
+    <p>Slovenčina má rada spoluhláskové zhluky (<em>štvrť, prsteň, zmrzol</em>). V reči sú v pohode, ale v rýchlom speve sa o ne jazyk potkýna. Ak píšeš rýchlu, energickú pieseň, sleduj zhluky typu <em>-štvr-, -zmr-, -pstr-</em> a zvažuj, či ich nenahradiť plynulejším slovom.</p>
+
+    <div class="callout warn">
+      <div class="callout-label">Pre Suno AI</div>
+      <p style="margin:0">Vyššie tempo (BPM) + dlhé verše + zhluky spoluhlások = model „zožerie“ slabiky alebo znie neartikulovane. Čím rýchlejšia pieseň, tým kratšie a plynulejšie verše potrebuješ. Pri 8+ slabikách na riadok drž tempo pod ~98 BPM.</p>
+    </div>
+
+    <h2>Frázovanie — kde sa dýcha</h2>
+    <p>Dobrý text má „dychové miesta“ — prirodzené pauzy, kde sa spevák nadýchne. Interpunkcia (čiarka, bodka) tieto miesta naznačuje. Keď píšeš, predstav si, kde by sa spevák nadýchol, a stavaj verše okolo týchto pauz.</p>
+
+    <div class="lyric">Dobré frázovanie:
+„Ešte raz sa obzriem, (nádych)
+kým zhasne posledné svetlo mesta."
+
+Zlé (bez miesta na nádych):
+„Ešte raz sa obzriem kým zhasne posledné svetlo veľkého mesta na obzore.“</div>
+
+    <h2>Zhoda melódie a emócie</h2>
+    <p>Stúpajúca melódia = otvorenie, nádej, otázka. Klesajúca = uzavretie, smútok, odpoveď. Keď píšeš text, uvedom si, kam emocionálne smeruje — a ten smer podporí aj melódia. Refrén zvyčajne stúpa (vrchol), verš je pokojnejší.</p>
+
+    <h2>Z tvorby Leily K — spevné otvorené koncovky</h2>
+    <p>„Len jeden deň" od Leily K má koncovky stavané na držané tóny:</p>
+    <div class="lyric">Túžim prežiť len jediný deň
+Jasný a slnkom prežiarený
+Deň čo bude mať krátky tieň
+Pokojný, kľudný bez premenných</div>
+    <p>Otvorené, spevné koncovky (deň, tieň) sa dajú prirodzene natiahnuť na dlhých tónoch — verše plynú na jeden nádych a nelámu sa cez melódiu.</p>
+    <p><span class="example-artist">Leila K — Len jeden deň</span></p>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"Aký je „test jedného nádychu“?",
+       opts:["Či sa verš rýmuje","Či sa verš dá vysloviť na jeden nádych bez zakoktania","Či má verš 8 slabík","Či sa dá zaspievať vysoko"],correct:1},
+      {q:"Aké samohlásky fungujú lepšie na dlhých tónoch a koncoch veršov?",
+       opts:["Zatvorené a useknuté","Otvorené (á, ó, é), ktoré sa dajú natiahnuť","Nezáleží na tom","Len i a y"],correct:1},
+      {q:"Čo sa stane pri rýchlom tempe a dlhých veršoch so zhlukmi spoluhlások v Suno?",
+       opts:["Zlepší sa artikulácia","Model môže „zožrať“ slabiky alebo znieť neartikulovane","Pieseň sa spomalí","Nič, je to jedno"],correct:1}
+    ]
+  }
+},
+{
+  id:"tema", group:"Obsah a poetika", num:"5", title:"Téma, posolstvo, príbeh",
+  html:`
+    <div class="eyebrow">Modul 5 · Obsah a poetika</div>
+    <h1>Téma, posolstvo a príbeh</h1>
+    <p class="lede">Technika bez obsahu je prázdna. Najlepšie remeslo sveta nezachráni pieseň, ktorá nemá čo povedať. Tu sa učíme, ako dať textu vnútro.</p>
+
+    <h2>Od témy k situácii</h2>
+    <p>„Láska“ nie je téma piesne — je to príliš veľké a prázdne. Piesne nefungujú na abstraktných témach, ale na <strong>konkrétnych situáciách</strong>. Nie „láska“, ale „ráno po tom, čo odišla, a jej hrnček je ešte na stole“. Konkrétny moment nesie univerzálnu emóciu lepšie než abstraktné slovo.</p>
+
+    <div class="callout tip">
+      <div class="callout-label">Cvičenie</div>
+      <p style="margin:0">Vezmi veľkú tému (samota, strach, radosť) a nájdi pre ňu <strong>jeden konkrétny moment</strong>: miesto, čas, gesto, predmet. Ten moment je tvoja pieseň. Zvyšok je len abstrakcia.</p>
+    </div>
+
+    <h2>Emocionálny oblúk</h2>
+    <p>Pieseň nie je statická — <strong>niekam sa pohybuje</strong>. Dobrý text má oblúk: začína v jednom emocionálnom stave a končí v inom. Napríklad: nostalgia → prijatie, hnev → odpustenie, strach → odhodlanie.</p>
+    <p>Tento pohyb je to, čo drží poslucháča. Ak je pieseň celý čas v rovnakej nálade, unaví. Bridge je často miesto, kde sa oblúk „zlomí“ a otočí.</p>
+
+    <table>
+      <tr><th>Časť piesne</th><th>Emocionálna funkcia</th></tr>
+      <tr><td>Verš 1</td><td>Nastolenie situácie, počiatočný stav</td></tr>
+      <tr><td>Refrén</td><td>Jadro emócie, hlavný pocit</td></tr>
+      <tr><td>Verš 2</td><td>Prehĺbenie, komplikácia, nová vrstva</td></tr>
+      <tr><td>Bridge</td><td>Zlom, uvedomenie, otočka</td></tr>
+      <tr><td>Záverečný refrén</td><td>Tá istá emócia, ale premenená zlomom</td></tr>
+    </table>
+
+    <h2>Podtext — sila nevypovedaného</h2>
+    <p>Najlepšie texty <strong>nehovoria všetko</strong>. To, čo sa nepovie, nesie emóciu rovnako ako to, čo zaznie. Namiesto „som zúfalý a osamelý“ ukáž scénu, z ktorej to vyplynie — a nechaj poslucháča dôjsť k záveru samého.</p>
+
+    <div class="lyric">Priamo (slabšie):
+„Som taký smutný, že si odišla, chýbaš mi.“
+
+Podtext (silnejšie):
+„Ešte stále varím pre dvoch.
+Zvyk je zvyk."</div>
+
+    <p>Druhý príklad nikde nepovie „smútok“ ani „samota“ — a predsa to cítiš silnejšie. Toto je majstrovstvo, ku ktorému smerujeme.</p>
+
+    <h2>Kto rozpráva a komu</h2>
+    <p>Každá pieseň má <strong>hlas</strong> (kto hovorí) a <strong>adresáta</strong> (komu). Ujasni si to pred písaním:</p>
+    <ul>
+      <li><strong>Ja → ty</strong>: najintímnejšie, priama adresa („Vieš, že som ťa čakal“)</li>
+      <li><strong>Ja → svet</strong>: vyznanie, spoveď („Nikdy som nevedel, kam patrím“)</li>
+      <li><strong>On/ona (rozprávač)</strong>: príbeh o niekom inom, odstup</li>
+    </ul>
+    <p>
+      <span class="example-artist">Zuzana Smatanová</span>
+      <span class="example-artist">Peha</span>
+      <span class="example-artist">Richard Müller</span>
+    </p>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"Prečo „láska“ nie je dobrá téma piesne?",
+       opts:["Je príliš častá","Je príliš abstraktná — piesne fungujú na konkrétnych situáciách","Nedá sa zrýmovať","Je to klišé slovo"],correct:1},
+      {q:"Čo je emocionálny oblúk?",
+       opts:["Rýmová schéma","Pohyb piesne z jedného emocionálneho stavu do iného","Melódia refrénu","Dĺžka piesne"],correct:1},
+      {q:"Čo znamená „podtext“ v texte?",
+       opts:["Text pod refrénom","Emócia, ktorá vyplýva z nevypovedaného, nie z priameho pomenovania","Poznámky pre speváka","Druhý hlas"],correct:1}
+    ]
+  }
+},
+{
+  id:"obraznost", group:"Obsah a poetika", num:"6", title:"Obraznosť a metafory",
+  html:`
+    <div class="eyebrow">Modul 6 · Obsah a poetika</div>
+    <h1>Obraznosť, metafory a jazyk</h1>
+    <p class="lede">Obraz je to, čím sa pieseň zaryje do pamäti. Ale metafora, ktorá nefunguje, je horšia než jednoduché priame slovo.</p>
+
+    <h2>Obraz, nie opis</h2>
+    <p>Základný princíp poézie aj songwritingu: <strong>ukáž, nehovoř</strong>. Namiesto deklarácie citu ukáž scénu, detail, gesto. Abstraktné vyhlásenia („som smutný“, „láska bolí“) fungujú len ako zámerný refrénový úder — nikdy ako výplň slohy.</p>
+
+    <div class="lyric">Opis (slabé):
+„Bolo mi zle a cítil som sa opustený.“
+
+Obraz (silné):
+„Popolník plný. Telefón tichý.
+Tri dni tie isté ponožky."</div>
+
+    <h2>Ako funguje dobrá metafora</h2>
+    <p>Metafora spája dve nespojené veci tak, že vznikne nový význam. Kľúč: <strong>metafora ≠ nezmysel</strong>. Každý obraz musí byť <em>parafrázovateľný</em> — musíš vedieť povedať, čo znamená. Ak to nevieš vysvetliť ani sebe, je to len pekne znejúci zmätok.</p>
+
+    <div class="callout tip">
+      <div class="callout-label">Test parafrázy</div>
+      <p style="margin:0">Ku každému metaforickému veršu si povedz prozaickú vetu, čo znamená. „Tvoje mlčanie je zima, ktorá neodchádza“ → „tvoj odstup ma dlhodobo zraňuje“. Funguje. Ak parafráza nejde, metafora je prázdna.</p>
+    </div>
+
+    <h2>Miera metaforickosti podľa žánru</h2>
+    <table>
+      <tr><th>Register</th><th>Miera obraznosti</th><th>Príklad prístupu</th></tr>
+      <tr><td>Ľudový / folk</td><td>Nízka–stredná</td><td>Konkrétne, prírodné obrazy</td></tr>
+      <tr><td>Pop</td><td>Stredná</td><td>Zrozumiteľné, univerzálne metafory</td></tr>
+      <tr><td>Art-rock / poézia</td><td>Vysoká</td><td>Vrstevnaté, symbolické obrazy</td></tr>
+      <tr><td>Rap</td><td>Premenlivá</td><td>Slovné hračky, prirovnania, dvojzmysly</td></tr>
+    </table>
+
+    <div class="callout warn">
+      <div class="callout-label">Pozor na rozpor</div>
+      <p style="margin:0">Zložitá, symbolická metaforika v jednoduchej ľudovej piesni pôsobí falošne — a naopak. Register jazyka musí sedieť k žánru a téme. Ak píšeš surový mestský text, zložitá poetická metafora doň nepatrí.</p>
+    </div>
+
+    <h2>Klišé — smrť obraznosti</h2>
+    <p>Klišé je metafora, ktorá bola taká dobrá, že ju použili milióny ľudí, až sa obnosila. „Srdce z kameňa“, „more sĺz“, „oheň lásky“, „cesta životom“. Poslucháč ich prejde bez povšimnutia. Tvoja úloha: nájsť <strong>vlastný, svieži obraz</strong> pre tú istú emóciu.</p>
+
+    <h2>Prirodzená slovenčina</h2>
+    <p>Posledné, ale kľúčové: <strong>žiadne anglické kalky</strong>. Spojenia preložené z angličtiny znejú v slovenčine cudzo. „Robím lásku k tebe“, „to dáva zmysel v mojom srdci“ — to nie je slovenčina. Píš tak, ako sa reálne rozpráva, len povýšené na poéziu.</p>
+    <p>
+      <span class="example-artist">Ursiny (art-rocková symbolika)</span>
+      <span class="example-artist">Filip (slovné hračky)</span>
+      <span class="example-artist">Kraskо (hudobnosť verša)</span>
+    </p>
+
+    <h2>Z tvorby Leily K — viacvrstvová metafora a jazyková medzera</h2>
+    <p><strong>Dvojzmysel</strong> — „Instantný život":</p>
+    <div class="lyric">Si uväznený v holej vete</div>
+    <p>„Holá veta" je gramatický termín (veta bez rozvíjajúcich členov) aj obraz človeka ochudobneného o všetko, čo ho robí plnohodnotným. Práve ten dvojzmysel je vrchol obraznosti — a prejde testom parafrázy.</p>
+    <p><strong>Obraz z reálnej jazykovej medzery</strong> — „Blázon":</p>
+    <div class="lyric">Keby bol ženský rod od slova blázon, tak by to bolo o mne</div>
+    <p>Najsilnejší obraz môže vyrásť z jazyka samého — slovenčina naozaj nemá bežný ženský tvar slova „blázon" a tá medzera sa stáva metaforou zakázanej časti seba.</p>
+    <p><span class="example-artist">Leila K — Instantný život</span><span class="example-artist">Blázon</span></p>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"Čo znamená princíp „ukáž, nehovoř“?",
+       opts:["Píš potichu","Namiesto deklarácie citu ukáž scénu, detail alebo gesto","Používaj veľa prídavných mien","Nepoužívaj metafory"],correct:1},
+      {q:"Aký je „test parafrázy“ pre metaforu?",
+       opts:["Či sa rýmuje","Či vieš povedať prozaickou vetou, čo metafora znamená","Či je dostatočne zložitá","Či ju použil známy autor"],correct:1},
+      {q:"Prečo sa vyhýbame klišé ako „srdce z kameňa“?",
+       opts:["Sú gramaticky zlé","Sú obnosené, poslucháč ich prejde bez povšimnutia","Sú príliš dlhé","Nedajú sa zaspievať"],correct:1},
+      {q:"Čo je „anglický kalk“?",
+       opts:["Anglické slovo v texte","Spojenie doslovne preložené z angličtiny, ktoré v slovenčine znie cudzo","Rýmovanie s angličtinou","Refrén po anglicky"],correct:1}
+    ]
+  }
+},
+{
+  id:"zanre1", group:"Žánre", num:"7", title:"Žánre I — pop, folk, rock",
+  html:`
+    <div class="eyebrow">Modul 7 · Žánre</div>
+    <h1>Žánrové špecifiká I<br><span style="font-size:20px;color:var(--ink-soft)">Pop · Folk · Rock</span></h1>
+    <p class="lede">Každý žáner má vlastné pravidlá hry — inú štruktúru, iný jazyk, iné očakávania. To, čo funguje v pope, môže v rocku pôsobiť lacno.</p>
+
+    <h2>Pop / Mainstream</h2>
+    <p>Pop stojí na <strong>okamžitej zapamätateľnosti</strong>. Refrén musí chytiť po prvom vypočutí. Štruktúra je zvyčajne priamočiara (V–R–V–R–B–R), jazyk zrozumiteľný, emócia univerzálna.</p>
+    <ul>
+      <li><strong>Refrén je kráľ</strong> — najsilnejšia melódia aj text, opakuje sa doslova</li>
+      <li><strong>Hook</strong> — jedna chytľavá fráza alebo motív, ktorý sa vryje do pamäti</li>
+      <li><strong>Jednoduchý jazyk</strong> — stredná metaforickosť, žiadne temné symboly</li>
+      <li><strong>Univerzálna téma</strong> — láska, túžba, sloboda; každý sa musí vedieť stotožniť</li>
+    </ul>
+    <p><span class="example-artist">Jana Kirschner</span><span class="example-artist">Zuzana Smatanová</span><span class="example-artist">Celeste Buckingham</span></p>
+
+    <h2>Folk / Folk-rock</h2>
+    <p>Folk stojí na <strong>príbehu a autentickosti</strong>. Text je často naratívny — rozpráva príbeh, kreslí obraz, spomína. Jazyk je konkrétny, prírodný, úprimný. Menej lesku, viac pravdy.</p>
+    <ul>
+      <li><strong>Naratívnosť</strong> — pieseň často rozpráva príbeh od začiatku do konca</li>
+      <li><strong>Konkrétne obrazy</strong> — krajina, ročné obdobia, každodenné veci</li>
+      <li><strong>Spevnosť</strong> — melódia sa dá ľahko zaspievať aj pri gitare</li>
+      <li><strong>Úprimnosť nad efektom</strong> — radšej pravdivé než pôsobivé</li>
+    </ul>
+    <p><span class="example-artist">Peter Bič Project</span><span class="example-artist">Longital</span><span class="example-artist">Zuzana Homolová</span></p>
+
+    <h2>Rock / Alternatíva</h2>
+    <p>Rock stojí na <strong>energii a postoji</strong>. Text môže byť surovejší, priamejší, vzdorovitejší. Je tu priestor pre hnev, iróniu, spoločenský komentár. Refrén býva hymnický — na spievanie v dave.</p>
+    <ul>
+      <li><strong>Postoj a nerv</strong> — text má názor, energiu, niekedy provokáciu</li>
+      <li><strong>Hymnický refrén</strong> — jednoduchý, silný, na hromadné spievanie</li>
+      <li><strong>Priamosť</strong> — hovorový až surový jazyk, menej ozdôb</li>
+      <li><strong>Dynamika</strong> — kontrast tichých veršov a explozívneho refrénu</li>
+    </ul>
+    <p><span class="example-artist">Horkýže Slíže</span><span class="example-artist">Iné Kafe</span><span class="example-artist">Para</span><span class="example-artist">Hex</span></p>
+
+    <div class="callout tip">
+      <div class="callout-label">Pre Suno AI</div>
+      <p style="margin:0">Žáner nastavíš v style prompte — a je to prvé, čo model číta. Daj žáner a subžáner do prvých 20–30 slov promptu. „Slovak folk-rock, acoustic, storytelling“ nastaví úplne iný výsledok než „Slovak pop, radio-friendly, catchy hook“.</p>
+    </div>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"Na čom primárne stojí pop?",
+       opts:["Na zložitých metaforách","Na okamžitej zapamätateľnosti refrénu","Na dlhých príbehoch","Na surovom postoji"],correct:1},
+      {q:"Čo je typické pre folkový text?",
+       opts:["Hymnický refrén na spievanie v dave","Naratívnosť a konkrétne, prírodné obrazy","Vysoká abstraktná symbolika","Slovné hračky a dvojzmysly"],correct:1},
+      {q:"Čím sa vyznačuje rockový text?",
+       opts:["Jemnosťou a náznakmi","Postojom, energiou a často hymnickým refrénom","Zložitou naratívnou štruktúrou","Nízkou emóciou"],correct:1}
+    ]
+  }
+}
+];
+
+/* ================= OBSAH KURZU — ČASŤ 3 (moduly 8–10 + projekt) ================= */
+
+const MODULES_P3 = [
+{
+  id:"zanre2", group:"Žánre", num:"8", title:"Žánre II — rap a hip-hop",
+  html:`
+    <div class="eyebrow">Modul 8 · Žánre</div>
+    <h1>Žánrové špecifiká II<br><span style="font-size:20px;color:var(--ink-soft)">Rap · Hip-hop v slovenčine</span></h1>
+    <p class="lede">Rap je najhustejší textový žáner — najviac slov na minútu, najviac rýmov, najviac hry s jazykom. A slovenčina má preň vlastné pravidlá.</p>
+
+    <h2>Flow — rytmus reči nad beatom</h2>
+    <p>V rape je <strong>flow</strong> všetko. Je to spôsob, akým slová padajú na beat — ich rytmus, dôraz, tempo. Text, ktorý vyzerá dobre na papieri, môže mať mŕtvy flow. A naopak, jednoduché slová s dobrým flow znejú skvele.</p>
+    <p>Kľúč pre slovenčinu: <strong>prízvuk na prvej slabike</strong> (rovnako ako všade v SJ) určuje, kam padajú prízvučné doby beatu. Slovenský rap, ktorý ignoruje prirodzený prízvuk, znie „preložene“ z angličtiny.</p>
+
+    <h2>Hustota rýmov</h2>
+    <p>Rap má oveľa vyššiu hustotu rýmov než pop. Používa:</p>
+    <ul>
+      <li><strong>Vnútorné rýmy</strong> — viac rýmov v jednom verši, nie len na konci</li>
+      <li><strong>Multi-slabičné rýmy</strong> — rýmuje sa viac slabík naraz: „<em>na mape stráca</em> / <em>za tebou vracia</em>“</li>
+      <li><strong>Reťaze rýmov</strong> — jeden rýmový zvuk beží cez viac veršov</li>
+    </ul>
+
+    <h2>Slovné hračky a dvojzmysly</h2>
+    <p>Rap miluje jazyk. Slovné hračky, dvojzmysly, prekvapivé prirovnania — to je remeselná pýcha žánru. Ale pozor: <strong>dvojzmysel musí byť zámerný</strong>. Neúmyselná dvojzmyselnosť (napr. komická tam, kde má byť vážna) pieseň zhodí.</p>
+
+    <div class="callout tip">
+      <div class="callout-label">Punchline</div>
+      <p style="margin:0">Rapová sloha často smeruje k <strong>punchline</strong> — údernému, prekvapivému záveru. Buduj napätie a rozraz ho poslednou frázou. Najlepšie punchliny spoja neočakávané veci alebo otočia význam.</p>
+    </div>
+
+    <h2>Štruktúra rapu</h2>
+    <table>
+      <tr><th>Časť</th><th>Funkcia</th></tr>
+      <tr><td>Hook (refrén)</td><td>Chytľavá, opakovaná časť — často spievaná, melodickejšia</td></tr>
+      <tr><td>Verse (16-ka)</td><td>Hustý rapový verš, zvyčajne 16 taktov</td></tr>
+      <tr><td>Bridge / Break</td><td>Zmena flow, oddych, zvrat</td></tr>
+    </table>
+    <p>Typická štruktúra: <strong>Hook–Verse–Hook–Verse–Hook</strong>. Hook je melodickejší kontrast k hustému veršu.</p>
+
+    <div class="callout warn">
+      <div class="callout-label">Pre Suno AI</div>
+      <p style="margin:0">Rap v slovenčine je pre Suno náročnejší — hustý text pri vyššom tempe môže model „zožrať“. Používaj tag <code>[Rap Verse]</code> pre verše a <code>[Hook]</code> alebo <code>[Chorus]</code> pre refrén. Ak je artikulácia nečitateľná, zníž tempo alebo Audio Influence.</p>
+    </div>
+    <p><span class="example-artist">Kontrafakt</span><span class="example-artist">Rytmus (H16)</span><span class="example-artist">Vec</span><span class="example-artist">Separ</span></p>
+
+    <h2>Z tvorby Leily K — satirický register a generačný jazyk</h2>
+    <p>„Digitálny race" od Leily K pracuje s krátkymi údermi, slangom a kódovým prepínaním SK↔EN:</p>
+    <div class="lyric">Všetci sú delulu
+Majú ťa za nulu
+Prestaň už checkovať
+Kto ti dá za post lajk</div>
+    <p>Slová ako delulu, checkovať, lajk nie sú nedbalosť, ale jazyková vernosť skutočnosti — presne ten hovorový, generačný register, na ktorom stojí súčasný rap a satira. Rytmus krátkych šesťslabičných riadkov sám mimikuje tempo scrollovania.</p>
+    <p><span class="example-artist">Leila K — Digitálny race</span></p>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"Čo je „flow“ v rape?",
+       opts:["Melódia refrénu","Spôsob, akým slová padajú na beat — ich rytmus a dôraz","Počet veršov","Rýmová schéma"],correct:1},
+      {q:"Čo je multi-slabičný rým?",
+       opts:["Rým s viacerými slovami","Rým, kde sa zhoduje viac slabík naraz","Rým v refréne","Vnútorný rým"],correct:1},
+      {q:"Čo je punchline?",
+       opts:["Úvodný verš","Úderný, prekvapivý záver slohy","Refrén","Beat"],correct:1},
+      {q:"Prečo je slovenský rap náročnejší pre Suno pri vysokom tempe?",
+       opts:["Suno nerozumie po slovensky","Hustý text pri vyššom tempe môže model „zožrať“ — treba znížiť tempo/Audio Influence","Rap sa nedá tagovať","Nie je to pravda"],correct:1}
+    ]
+  }
+},
+{
+  id:"suno", group:"Prax a Suno", num:"9", title:"Základy Suno v5.5",
+  html:`
+    <div class="eyebrow">Modul 9 · Prax a Suno</div>
+    <h1>Optimalizácia textu pre Suno v5.5</h1>
+    <p class="lede">Máš dobrý text. Teraz ho treba pripraviť tak, aby ho model zaspieval presne tak, ako počuješ v hlave. Základom je pochopiť, že Suno má dve oddelené „mozgy".</p>
+
+    <h2>Systém dvoch polí (Dual Brain System)</h2>
+    <p>Suno pracuje s dvoma poliami, ktoré sa <strong>nikdy nemiešajú</strong>. Miešanie inštrukcií medzi nimi spôsobuje „inštrukčný kolaps" — model príkazy ignoruje alebo interpretuje nekonzistentne.</p>
+    <table>
+      <tr><th>Pole štýlu (Style) — globálne</th><th>Pole textu (Lyrics) — lokálne</th></tr>
+      <tr><td>Žáner a subžáner</td><td>Štrukturálne sekčné tagy</td></tr>
+      <tr><td>Vokálna identita (pohlavie, register, timbre)</td><td>Samotný text</td></tr>
+      <tr><td>Nálada a emócia (globálne)</td><td>Delivery a emotion tagy</td></tr>
+      <tr><td>Produkčné efekty (priestor, mix)</td><td>Frázovacie čiarky</td></tr>
+      <tr><td>BPM, Key, Source_influence</td><td>Formátovacie symboly</td></tr>
+    </table>
+    <div class="callout warn">
+      <div class="callout-label">Kľúčové pravidlo polí</div>
+      <p style="margin:0">Znak <code>|</code> (pipe) patrí <strong>výhradne</strong> do poľa Lyrics (na stacking tagov). V poli Style spôsobuje kolaps — tam vždy nový riadok a čiarky. Podrobne o oboch poliach v moduloch 9a a 9b.</p>
+    </div>
+
+    <h2>Tri syntaktické nástroje — kritické rozlíšenie</h2>
+    <table>
+      <tr><th>Formát</th><th>Funkcia</th><th>Príklad</th></tr>
+      <tr><td><code>[Tag]</code></td><td>Inštrukcia — <strong>NESPIEVANÁ</strong></td><td><code>[Whisper]</code> <code>[Sad]</code></td></tr>
+      <tr><td><code>( )</code></td><td>Backing vocal — <strong>VŽDY SPIEVANÝ</strong></td><td><code>(oh yeah)</code></td></tr>
+      <tr><td><code>" "</code></td><td>Spoken / whispered text</td><td><code>"nikdy si neprišiel"</code></td></tr>
+    </table>
+    <div class="callout warn">
+      <div class="callout-label">Najčastejšia chyba</div>
+      <p style="margin:0">Ak napíšeš <code>(whispered)</code>, model <strong>zaspieva slovo</strong> „whispered". Zátvorky <code>( )</code> sa vždy spievajú. Na inštrukciu šepkania použi <code>[Whisper]</code> na vlastnom riadku pred veršom.</p>
+    </div>
+
+    <h2>BPM stropy pre slovenčinu</h2>
+    <p>Slovenčina má dĺžne a spoluhláskové zhluky, ktoré pri vysokom tempe model komolí. Drž sa týchto stropov podľa dĺžky riadkov:</p>
+    <table>
+      <tr><th>Podmienka</th><th>Max BPM</th></tr>
+      <tr><td>Riadky 8+ slabík</td><td>98 BPM</td></tr>
+      <tr><td>Riadky 9–10 slabík</td><td>95 BPM</td></tr>
+      <tr><td>Riadky 11–12 slabík</td><td>90 BPM</td></tr>
+      <tr><td>Výrazné spoluhláskové zhluky</td><td>92 BPM</td></tr>
+    </table>
+
+    <h2>Rod hlasu — povinná dvojitá deklarácia</h2>
+    <p>Rod hlasu deklaruj v Style poli <strong>dvakrát</strong>, inak môže model kolísať:</p>
+    <div class="lyric">Vocals: female, warm mezzo, breathy lower register, conversational delivery
+Voice gender: female</div>
+    <div class="callout warn">
+      <div class="callout-label">ROD CHECK — pred generovaním</div>
+      <p style="margin:0">Over gramatický rod lyrickej osoby v texte <strong>pred</strong> tvorbou promptu. Ak text hovorí „Čakala som" (žena) a plánuješ mužský hlas, vznikne konflikt. Rod textu a rod hlasu musia sedieť.</p>
+    </div>
+
+    <h2>Controls — Weirdness a Style Influence</h2>
+    <table>
+      <tr><th>Situácia</th><th>Weirdness</th><th>Style Influence</th></tr>
+      <tr><td>Štandardné generovanie</td><td>20–30 %</td><td>85–95 %</td></tr>
+      <tr><td>Experimentálny žáner</td><td>do 50 %</td><td>70–85 %</td></tr>
+      <tr><td>Problémy s artikuláciou</td><td>znížiť o 5–10 %</td><td>znížiť o 5–10 %</td></tr>
+    </table>
+
+    <h2>Troubleshooting — rýchly prehľad</h2>
+    <table>
+      <tr><th>Symptóm</th><th>Riešenie</th></tr>
+      <tr><td>Spevák číta tag nahlas</td><td>Tag musí byť na vlastnom riadku pred textom</td></tr>
+      <tr><td>Skladba loopuje</td><td>Pridať <code>[End]</code> alebo <code>[Fade Out]</code></td></tr>
+      <tr><td>Intro chýba</td><td><code>[Instrumental]</code> + prázdny riadok pred <code>[Verse 1]</code></td></tr>
+      <tr><td>Žáner sa ignoruje</td><td>Žáner do prvých 20–30 slov Style poľa</td></tr>
+      <tr><td>Generický hlas</td><td>Konkretizovať Vocals: timbre + technika + emócia</td></tr>
+      <tr><td>Robotický hlas</td><td>Emotion tag <code>[Tender]</code> <code>[Desperate]</code> pred verš</td></tr>
+      <tr><td>Zlá výslovnosť dĺžní</td><td>Znížiť BPM + <code>~</code> na dĺžňach + „vowel length respected"</td></tr>
+      <tr><td>Skladba sa usekne</td><td>Skrátiť riadky na 4–6 slov</td></tr>
+    </table>
+
+    <h2>Z praxe — jeden text, viac žánrových smerov</h2>
+    <p>Reálna ukážka od Leily K: text „Len jeden deň" ponúka v Style poli tri odlišné žánrové smery, každý s vlastným BPM stropom podľa slovenčiny:</p>
+    <table>
+      <tr><th>Žáner</th><th>Tempo</th></tr>
+      <tr><td>Slovak Modern Folk / Chanson</td><td>86 BPM</td></tr>
+      <tr><td>Dark Chamber Pop / Neo-Classical</td><td>76–84 BPM</td></tr>
+      <tr><td>Slowcore / Dream Folk</td><td>72 BPM</td></tr>
+    </table>
+    <p>Ten istý text, tri charaktery — o výsledku rozhoduje Style pole, nie text. Práve preto sa žáner a BPM ladia oddelene od Lyrics.</p>
+
+    <div class="callout tip">
+      <div class="callout-label">Stagovaná generácia</div>
+      <p style="margin:0">Negeneruj hneď celú skladbu. Osvedčený postup: najprv <strong>Verse 1 + Chorus 1</strong> → over, či sedí artikulácia a žáner → až potom plná skladba. Ušetríš kredity aj nervy.</p>
+    </div>
+  `,
+  quiz:{
+    pass:3,
+    questions:[
+      {q:"Čo je „Dual Brain System“ v Suno?",
+       opts:["Dva speváci naraz","Dve oddelené polia — Style a Lyrics — ktoré sa nemiešajú","Dve verzie piesne","Dvojitý refrén"],correct:1},
+      {q:"Kam patrí znak | (pipe)?",
+       opts:["Do Style poľa","Výhradne do Lyrics poľa (stacking tagov); v Style spôsobuje kolaps","Do oboch polí","Nikam"],correct:1},
+      {q:"Aký je BPM strop pre slovenské riadky s 11–12 slabikami?",
+       opts:["98 BPM","95 BPM","90 BPM","120 BPM"],correct:2},
+      {q:"Ako sa deklaruje rod hlasu v Style poli?",
+       opts:["Raz stačí","Dvakrát — riadok Vocals aj Voice gender","V Lyrics poli","Netreba ho deklarovať"],correct:1},
+      {q:"Čo urobí Suno, ak napíšeš (whispered) do okrúhlych zátvoriek?",
+       opts:["Bude šepkať","Zaspieva slovo „whispered“ — zátvorky sa vždy spievajú","Ignoruje to","Stíši skladbu"],correct:1}
+    ]
+  }
+},
+{
+  id:"suno-style", group:"Prax a Suno", num:"9a", title:"Style prompty do hĺbky",
+  html:`
+    <div class="eyebrow">Modul 9a · Prax a Suno</div>
+    <h1>Style prompty do hĺbky</h1>
+    <p class="lede">Style prompt je globálny „mozog" piesne. Rozhoduje o žánri, hlase a produkcii. Tu sa naučíš napísať ho tak, aby výsledok nebol generický AI zvuk, ale konkrétny charakter.</p>
+
+    <h2>Front-loading — prvých 20–30 slov</h2>
+    <p>Model dáva <strong>najväčšiu váhu prvým 20–30 slovám</strong>. Žáner, subžáner a BPM preto musia byť vždy na začiatku. Čo napíšeš neskoro, model často „nedopočuje".</p>
+
+    <h2>Kompletná šablóna Style promptu</h2>
+    <p>Každý parameter na nový riadok, oddeľovač je čiarka, <strong>nikdy</strong> <code>|</code>, vždy po anglicky. Limit je <strong>1000 znakov</strong> vrátane Exclude bloku.</p>
+    <div class="lyric">[Žáner, subžáner]
+Mood: [2–3 slová — vždy anglicky]
+Tempo: [BPM podľa slovenského stropu]
+Key: [tónina — voliteľné: D minor, E major…]
+Instruments: [1 sólo nástroj + 3–6 ostatných]
+Percussion: [typ rytmického vzoru]
+Bass: [tón + pohyb]
+Vocals: [female/male — povinné prvé slovo], [register], [timbre], [prednes]
+Voice gender: [female / male]
+Mix: [FX, priestor, textúra]
+Energy: [krivka po sekciách]
+Source_influence: [produkčná charakteristika — BEZ mien interpretov]
+no [unwanted], no [unwanted]
+Sung in Slovak language with very clear articulation,
+natural Slovak stress and vowel length respected</div>
+
+    <div class="callout tip">
+      <div class="callout-label">Povinný slovenský riadok</div>
+      <p style="margin:0">Vždy ukonči prompt inštrukciou o slovenskej výslovnosti (dva riadky vyššie). Bez nej model komolí slová a prehadzuje prízvuk.</p>
+    </div>
+
+    <h2>Konkrétnosť porazí generickosť</h2>
+    <p>Toto je jadro celého remesla. Vágny prompt → generický AI hlas. Konkrétny prompt → rozlíšiteľný charakter. Sedem pravidiel konkrétnosti:</p>
+    <ul>
+      <li><strong>Žáner + subžáner + epocha:</strong> „classic Chicago deep house 1990s" &gt; „house music"</li>
+      <li><strong>BPM konkrétne:</strong> „122 BPM" &gt; „mid-tempo"</li>
+      <li><strong>Tónina konkrétne:</strong> „E minor" &gt; „minor key"</li>
+      <li><strong>Nástroj konkrétne:</strong> „Rhodes electric piano" &gt; „piano"; „Fender Telecaster through Vox amp" &gt; „guitar"</li>
+      <li><strong>Produkčná epocha:</strong> „80s analog warmth" / „2010s trap production"</li>
+      <li><strong>Jeden definičný zvuk:</strong> house = „four-on-the-floor kick"; UK drill = „sliding 808 bass"</li>
+      <li><strong>Negatívny priestor:</strong> „no auto-tune — the voice is human and proud of it"</li>
+    </ul>
+
+    <div class="callout">
+      <div class="callout-label">Generický vs. špecifický — príklad</div>
+      <p style="margin:0 0 8px"><strong>Generický</strong> (výsledok: AI default voice): „pop song, female vocals, sad"</p>
+      <p style="margin:0"><strong>Špecifický</strong> (rozlíšiteľný charakter): „dark indie pop, 70 BPM, low mezzo-soprano, breathy with vocal fry on low notes, intimate dry recording, slight room reverb, melancholic and inward, sparse piano and cello"</p>
+    </div>
+
+    <h2>Negatívne prompty — dva nástroje</h2>
+    <p><strong>1. Inline <code>no</code></strong> (na konci tela promptu) — vylučuje konkrétne prvky: <code>no autotune, no reverb wash</code>. Táto dvojica je najsilnejšia kombinácia pre organický, „neumelý" zvuk.</p>
+    <p><strong>2. Exclude styles blok</strong> (za hlavným promptom) — vylučuje celé žánre: <code>Exclude styles: jazz, EDM, drum machine, auto-tune</code>. Negatívne tagy vždy až na koniec.</p>
+
+    <h2>Zakázaný obsah v Style poli</h2>
+    <div class="callout warn">
+      <div class="callout-label">Nikdy do Style poľa</div>
+      <p style="margin:0">Mená interpretov ani albumov (Suno ich odmieta ako copyright) · naratívne formulácie a metafory · celé vety a komentáre · znak <code>|</code> · emoji · konverzačný jazyk („Please", „Make sure"). Iba technické metadáta.</p>
+    </div>
+
+    <h2>Voice cloning (v5.5 Pro/Premier)</h2>
+    <table>
+      <tr><th>Stav</th><th>Vocals:</th><th>Voice gender:</th></tr>
+      <tr><td>Bez klonovania</td><td>Povinný — plný popis</td><td>Povinný</td></tr>
+      <tr><td>S aktívnym Voice clone</td><td><strong>Vynechaj</strong> celý riadok</td><td>Ponechaj</td></tr>
+    </table>
+    <p>Pri klonovaní použi ušetrený priestor na produkčné detaily (Mix, priestor, textúra).</p>
+
+    <h2>Z tvorby Leily K — reálny front-loaded Style prompt</h2>
+    <p>Overený folk prompt k piesni „Tulák" (front-loading: žáner, BPM aj nástroje hneď na začiatku), ukončený povinným slovenským riadkom:</p>
+    <div class="lyric">Folk, Singer-songwriter, Acoustic ballad | Mood: melancholic, nostalgic, urgent | Tempo: 86 BPM | Instruments: fingerpicked acoustic guitar (lead), cello, upright bass, brushed snare, subtle piano | Vocals: male baritone, worn velvet tone, intimate mic technique, solo throughout | Sung in Slovak language with very clear articulation, natural Slovak stress and vowel length respected</div>
+    <p>Žáner je v prvých troch slovách, tempo drží slovenský BPM strop a záverečný riadok o výslovnosti bráni komoleniu a prehadzovaniu prízvuku.</p>
+
+    <h2>Duet — Three-Location Anchoring</h2>
+    <p>Jednoduchý duet tag spôsobuje „voice drift" (hlas sa mení). Rieši to <strong>trojkrokové ukotvenie</strong> na troch miestach:</p>
+    <div class="lyric">1. Style prompt:
+This is a duet between [A] (male) and [B] (female), [žáner]
+
+2. Lyric header (hore v Lyrics poli):
+[Duet: [A] male and [B] female]
+
+3. Per-sekcia label:
+[Verse 1]
+[[A]]
+… celý verš patrí jednému spevákovi …</div>
+    <div class="callout warn">
+      <div class="callout-label">Pravidlo stability duetu</div>
+      <p style="margin:0">Celé verše prideľuj jednému spevákovi — <strong>nikdy nestriedaj riadok po riadku</strong>. Hlas sa rozpadá pri prepínaní uprostred verša.</p>
+    </div>
+  `,
+  quiz:{
+    pass:3,
+    questions:[
+      {q:"Čo znamená front-loading?",
+       opts:["Napísať text tučne","Dať žáner, subžáner a BPM do prvých 20–30 slov (najväčšia váha)","Použiť veľa tagov","Písať veľkými písmenami"],correct:1},
+      {q:"Ktorá dvojica negatívnych tagov dáva najorganickejší zvuk?",
+       opts:["no drums, no bass","no autotune, no reverb wash","no vocals, no piano","no genre, no key"],correct:1},
+      {q:"Čo sa NIKDY nesmie dať do Style poľa?",
+       opts:["BPM","Mená interpretov, vety, znak | a emoji","Tóninu","Nástroje"],correct:1},
+      {q:"Ako sa rieši voice drift v duete?",
+       opts:["Jedným duet tagom","Three-Location Anchoring — ukotvenie na troch miestach","Vyšším Weirdness","Kratšími veršami"],correct:1},
+      {q:"Aký je najväčší rozdiel medzi „pop song, female, sad“ a dobrým promptom?",
+       opts:["Dĺžka","Konkrétnosť — subžáner, BPM, register, timbre, produkcia","Jazyk","Počet negatívnych tagov"],correct:1}
+    ]
+  }
+},
+{
+  id:"suno-tagy", group:"Prax a Suno", num:"9b", title:"Delivery a meta tagy",
+  html:`
+    <div class="eyebrow">Modul 9b · Prax a Suno</div>
+    <h1>Delivery a meta tagy v Lyrics poli</h1>
+    <p class="lede">Meta tagy sú inštrukcie v hranatých zátvorkách priamo v texte. Hovoria modelu, ako má každá sekcia znieť — namiesto dúfania, že to uhádne.</p>
+
+    <h2>Formátovacie symboly v texte</h2>
+    <table>
+      <tr><th>Symbol</th><th>Funkcia</th><th>Príklad</th></tr>
+      <tr><td><code>~</code></td><td>Hold noty, vibrato</td><td><code>prí~de</code> <code>stá~le</code></td></tr>
+      <tr><td><code>-</code></td><td>Naťahuj slabiky, hláskuj</td><td><code>po-ma-ly</code></td></tr>
+      <tr><td><code>ALL CAPS</code></td><td>Hlasnejšie — max 1–3 slová</td><td><code>NIKDY viac</code></td></tr>
+      <tr><td><code>" "</code></td><td>Spoken / whispered text</td><td><code>"si nikdy neprišiel"</code></td></tr>
+      <tr><td><code>......</code></td><td>Sustain — viac bodiek = dlhší hold</td><td><code>ticho............</code></td></tr>
+    </table>
+    <div class="callout tip">
+      <div class="callout-label">Slovenský trik s tildou</div>
+      <p style="margin:0">Tilda <code>~</code> na dĺžňach — <code>prí~de</code>, <code>stá~le</code> — pomáha modelu správne vykresliť dlhé slovenské samohlásky. Veľmi užitočné proti komoleniu.</p>
+    </div>
+
+    <h2>Sekčné tagy (Suno v5.5)</h2>
+    <p>Akceptované sekcie: <code>Intro · Verse · Pre-Chorus · Chorus · Post-Chorus · Bridge · Break · Breakdown · Build · Drop · Interlude · Outro · Hook · Refrain · Solo · Instrumental · Rap Verse · End · Fade Out · Final Chorus</code>.</p>
+    <p>Záverečné tagy riešia loopovanie: <code>[End]</code> (presné miesto konca), <code>[Fade Out]</code> (postupné vyznenie), <code>[Final Chorus]</code> (klimaktický záver).</p>
+
+    <h2>Emotion / delivery tagy</h2>
+    <p>Umiestni ich na <strong>vlastný riadok pred</strong> emotívny verš. <strong>Nestackuj</strong> ich s <code>|</code>. Výber:</p>
+    <table>
+      <tr><th>Tag</th><th>Emócia</th></tr>
+      <tr><td><code>[Tender]</code></td><td>Jemný, láskyplný</td></tr>
+      <tr><td><code>[Vulnerable]</code></td><td>Surová, odhalená emócia</td></tr>
+      <tr><td><code>[Defiant]</code></td><td>Vzdorovitý, silný</td></tr>
+      <tr><td><code>[Desperate]</code></td><td>Naliehavý, surový</td></tr>
+      <tr><td><code>[Melancholic]</code></td><td>Smutný, nostalgický</td></tr>
+      <tr><td><code>[Triumphant]</code></td><td>Víťazný</td></tr>
+      <tr><td><code>[Crying voice]</code></td><td>Slzavý, prerývaný prednes</td></tr>
+      <tr><td><code>[Intimate]</code></td><td>Osobný, blízky</td></tr>
+    </table>
+
+    <h2>Štýl prednesu (vokálne tagy)</h2>
+    <p>Určujú techniku spevu: <code>[Whisper]</code> (intímny), <code>[Belted]</code> (silné držané noty), <code>[Falsetto]</code>, <code>[Spoken word]</code>, <code>[Rap]</code>, <code>[Melodic Rap]</code>, <code>[Raspy lead vocal]</code>, <code>[Crooning]</code> (plynný, intímny), <code>[Humming]</code>.</p>
+
+    <h2>Performance cues — jemné textúry (v okrúhlych)</h2>
+    <p>Detailné vokálne textúry sa dávajú do <code>( )</code> a <strong>spievajú sa ako súčasť prednesu</strong>. Sú to remeselné nuansy pre pokročilých:</p>
+    <div class="lyric">(breathy falsetto)         — vzdušné falzeto
+(catch in throat)          — zachytenie v hrdle (emočný zlom)
+(trembling on sustained note) — chvenie na držanom tóne
+(swelling from whisper to wail) — narastanie od šepotu po nárek
+(gravelly low note)        — štrkovitý hlboký tón
+(explosive belt moment)    — explozívny silný moment</div>
+
+    <h2>Tag stacking (pipe |)</h2>
+    <p>V Lyrics poli môžeš stackovať viac pokynov cez <code>|</code> — funguje ako „a zároveň". Veď <strong>názvom sekcie</strong>, max <strong>4 tagy</strong> na sekciu:</p>
+    <div class="lyric">[Chorus | anthemic | stacked harmonies | modern pop polish]
+[Verse | autotuned delivery | tuned male vocal | light reverb]</div>
+    <div class="callout warn">
+      <div class="callout-label">Pozor</div>
+      <p style="margin:0">Žiadne protichodné príkazy v jednom stacku (napr. <code>whispered | explosive</code>). A pripomienka: <code>|</code> len v Lyrics, nikdy v Style.</p>
+    </div>
+
+    <h2>Killer combo — dramatický zlom</h2>
+    <p>Spojenie hovoreného a emócie v jednom riadku vytvorí okamžitú zmenu nálady — ideálne pre básnické texty s emocionálnym oblúkom:</p>
+    <div class="lyric">[spoken word crying] prečo si odišiel [laughter]</div>
+
+    <h2>Z tvorby Leily K — keď text nemá refrén</h2>
+    <p>Báseň „Druhý pokus" nemá v predlohe opakovaný refrén. Ak takýto text pošleš Suno bez štruktúry, model refrén nenájde a vytvorí monotónnu skladbu bez vrcholu. Riešenie: refrén vytvor explicitne cez sekčné tagy a duplikáciu:</p>
+    <div class="lyric">[Chorus | full band | emotional lift]
+Teraz sme ako dvaja vtáci
+Ktorí vypadli z hniezda
+Skúsme si spolu niečo želať
+Kým na zem dopadne hviezda</div>
+    <p>Tú istú sekciu potom zopakuješ na ďalších miestach — Suno podľa štruktúrnych tagov pochopí, čo je refrén, a dá mu vrcholnú melódiu.</p>
+
+    <h2>Kompletný príklad (folk pre slovenčinu)</h2>
+    <div class="lyric">[Intro | fingerpicked acoustic guitar | intimate mic]
+
+[Verse | warm mezzo | conversational delivery | sparse arrangement]
+(breathy) Kráčam ticho po hrá~dzi…
+
+[Chorus | anthemic chorus | gentle harmonies | cello swell]
+[Powerful]
+A zostá~vam, aj keď nemusím
+(oh yeah)
+
+[Bridge | vulnerable | stripped]
+[Crying voice]
+"nikdy si neprišiel"
+
+[Final Chorus | Emotional release]
+[Triumphant]
+A zostá~vam!
+[End]</div>
+  `,
+  quiz:{
+    pass:3,
+    questions:[
+      {q:"Kam umiestniš emotion/delivery tag ako [Tender]?",
+       opts:["Do Style poľa","Na vlastný riadok pred emotívny verš, bez stackovania s |","Za verš","Do zátvoriek ( )"],correct:1},
+      {q:"Na čo slúži tilda ~ v slovenskom texte?",
+       opts:["Oddeľuje slohy","Hold noty/vibrato — na dĺžňach pomáha vykresliť dlhé samohlásky","Znamená pauzu","Je to backing vocal"],correct:1},
+      {q:"Koľko tagov je maximum na jednu sekciu pri stackingu?",
+       opts:["2","4","8","bez limitu"],correct:1},
+      {q:"Kde je rozdiel medzi [Whisper] a (whisper)?",
+       opts:["Žiadny","[Whisper] je inštrukcia (nespieva sa), (whisper) sa zaspieva ako slovo","Oba šepkajú","Oba sa spievajú"],correct:1},
+      {q:"Ktorý tag rieši loopovanie skladby?",
+       opts:["[Intro]","[End] alebo [Fade Out]","[Verse]","[Mood]"],correct:1}
+    ]
+  }
+},
+{
+  id:"revizia", group:"Prax a Suno", num:"10", title:"Analýza a revízia textov",
+  html:`
+    <div class="eyebrow">Modul 10 · Prax a Suno</div>
+    <h1>Analýza a revízia vlastných textov</h1>
+    <p class="lede">Písanie je prepisovanie. Prvá verzia nikdy nie je finálna. Tu sa učíme pozerať na vlastný text kriticky — a premeniť báseň na spievateľný text.</p>
+
+    <h2>Báseň verzus pesničkový text</h2>
+    <p>Nie každá dobrá báseň je dobrý pesničkový text. Báseň žije na papieri — môže mať nepravidelný rytmus, dlhé verše, zložitú syntax. Pesničkový text musí <strong>dýchať v čase</strong>, sadnúť do pravidelného metra a dať sa zaspievať. Toto sú najčastejšie úpravy pri premene básne na text:</p>
+    <table>
+      <tr><th>Báseň často má</th><th>Text potrebuje</th></tr>
+      <tr><td>Nepravidelnú dĺžku veršov</td><td>Zhodné dĺžky zodpovedajúcich veršov (±1 slabika)</td></tr>
+      <tr><td>Zložité súvetia</td><td>Kratšie celky, miesta na nádych</td></tr>
+      <tr><td>Bohatú, hustú obraznosť</td><td>Priestor — nie každý verš plný metafor</td></tr>
+      <tr><td>Voľnú štruktúru</td><td>Jasné časti: verš, refrén, bridge</td></tr>
+      <tr><td>Jedinečný priebeh</td><td>Opakovateľný refrén</td></tr>
+    </table>
+
+    <h2>Kontrolný zoznam revízie</h2>
+    <p>Prejdi svoj text bod po bode. Toto je remeselný filter, ktorým prechádzajú aj profesionáli:</p>
+    <ul>
+      <li>Dá sa každý verš vysloviť na jeden nádych, bez zakoktania?</li>
+      <li>Padá rytmický dôraz na prvé slabiky slov? Sú príklonky mimo silných pozícií?</li>
+      <li>Majú zodpovedajúce si verše naprieč slohami rovnaký počet slabík (±1)?</li>
+      <li>Je v každej slohe aspoň jeden konkrétny zmyslový obraz namiesto abstraktnej deklarácie?</li>
+      <li>Nie je tam vata, kalk ani inverzia slovosledu kvôli rýmu?</li>
+      <li>Je refrén jednoduchší a údernejší než slohy?</li>
+      <li>Prináša bridge skutočný zlom, nie opakovanie?</li>
+      <li>Ostalo niečo nepovedané (podtext)?</li>
+      <li>Sedia pády, predložkové väzby a kolokácie? Žiadne bohemizmy?</li>
+    </ul>
+
+    <div class="callout tip">
+      <div class="callout-label">Technika „nahlas a odstup“</div>
+      <p style="margin:0">Prečítaj text nahlas — najlepšie na druhý deň, s odstupom. Ucho zachytí, čo oko prehliadne. Miesta, kde sa zakoktáš alebo musíš „nasilu“ prízvukovať, sú miesta na prepis.</p>
+    </div>
+
+    <h2>Inverzia — skrytý nepriateľ</h2>
+    <p><strong>Inverzia</strong> je prehodenie prirodzeného slovosledu kvôli rýmu alebo metru. „Lásku k tebe cítim veľkú“ — nikto tak nehovorí. Prezrádza, že si sa podriadil forme. Keď ju nájdeš, prepíš celý verš, nech znie ako prirodzená reč.</p>
+
+    <div class="lyric">Inverzia (zle):
+„V srdci mojom bôľ sa skrýva“
+
+Prirodzene (dobre):
+„V srdci sa mi skrýva bôľ“
+alebo lepšie — obraz namiesto deklarácie:
+„Nosím to pod rebrami. Ťažké.“</div>
+
+    <h2>Ako veľa prepisovať</h2>
+    <p>Nešlifuj do nekonečna. Cieľom nie je „dokonalý“ text, ale text, ktorý <strong>znie a nesie pravdu</strong>. Keď prejde kontrolným zoznamom a znie prirodzene nahlas, je hotový. Zvyšok doladí hudba.</p>
+  `,
+  quiz:{
+    pass:2,
+    questions:[
+      {q:"V čom sa pesničkový text najviac líši od básne?",
+       opts:["Musí byť kratší","Musí dýchať v čase, sadnúť do metra a dať sa zaspievať","Nesmie mať metafory","Musí byť po anglicky"],correct:1},
+      {q:"Čo je inverzia?",
+       opts:["Opakovanie refrénu","Prehodenie prirodzeného slovosledu kvôli rýmu alebo metru","Zmena tóniny","Druh metafory"],correct:1},
+      {q:"Prečo čítať text nahlas a s odstupom?",
+       opts:["Aby si ho zapamätal","Ucho zachytí zakoktania a zlé prízvuky, ktoré oko prehliadne","Je to povinné","Aby si zistil dĺžku"],correct:1}
+    ]
+  }
+},
+{
+  id:"projekt", group:"Prax a Suno", num:"11", title:"Záverečný projekt",
+  html:`
+    <div class="eyebrow">Záverečný projekt</div>
+    <h1>Napíš a zhudobni vlastnú pieseň</h1>
+    <p class="lede">Teraz spojíš všetko dohromady. Toto nie je test s otázkami — je to tvorba. Prejdi krokmi a na konci budeš mať hotovú pieseň v Suno.</p>
+
+    <h2>Krok za krokom</h2>
+
+    <h3>1 · Koncept</h3>
+    <p>Vyber si <strong>jednu konkrétnu situáciu</strong> (nie tému). Urči hlas (kto rozpráva), adresáta (komu) a emocionálny oblúk (odkiaľ kam sa pieseň pohne). Napíš si to jednou-dvoma vetami.</p>
+
+    <h3>2 · Štruktúra a žáner</h3>
+    <p>Vyber žáner a jemu zodpovedajúcu štruktúru (Modul 7–8). Napríklad pop: V–R–V–R–B–R. Rozhodni sa pre slabičnú schému veršov (napr. 8–8–8–6).</p>
+
+    <h3>3 · Refrén</h3>
+    <p>Napíš refrén ako prvý — je to srdce piesne. Jednoduchý, úderný, zapamätateľný po prvom prečítaní. Skús napísať 2–3 varianty a vyber najsilnejší.</p>
+
+    <h3>4 · Verše a bridge</h3>
+    <p>Dopíš verše (rovnaká slabičná schéma!) a bridge, ktorý prinesie zlom. Verš 2 nech ide hlbšie než verš 1.</p>
+
+    <h3>5 · Revízia</h3>
+    <p>Prejdi kontrolný zoznam z Modulu 10. Prečítaj nahlas. Odstráň vatu, inverzie, kalky. Over slabiky a prízvuky.</p>
+
+    <h3>6 · Suno</h3>
+    <p>Otaguj štruktúru (<code>[Verse]</code>, <code>[Chorus]</code>…), napíš style prompt s front-loadingom žánru a povinným riadkom o slovenskej artikulácii, nastav Controls a generuj.</p>
+
+    <div class="callout">
+      <div class="callout-label">Šablóna style promptu</div>
+      <p style="margin:0;white-space:pre-line;font-family:'Courier New',monospace;font-size:14px">[žáner, subžáner], [BPM]
+Mood: [2–3 slová]
+Vocals: [female/male], [register], [timbre]
+Instruments: [1 sólo + 3–6 ostatných]
+Sung in Slovak language with very clear articulation, natural Slovak stress and vowel length respected</p>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-label">Gratulujem</div>
+      <p style="margin:0">Ak si prešiel všetkými modulmi, máš teraz nástroje, ktoré väčšina začínajúcich textárov nemá. Songwriting je remeslo — každá ďalšia pieseň bude lepšia než predošlá. Píš pravidelne, čítaj nahlas, počúvaj kriticky. A hlavne — píš o veciach, ktoré sú pre teba pravdivé.</p>
+    </div>
+
+    <div class="module-footer">
+      <button class="btn secondary" onclick="goTo(10)">← Späť na Modul 10</button>
+      <button class="btn" onclick="markProject()">Označiť projekt ako dokončený ✓</button>
+    </div>
+  `,
+  project:true
+}
+];
+
+/* ================= APLIKAČNÁ LOGIKA (jazykovo neutrálna) =================
+   Všetky viditeľné reťazce a STORE_KEY prichádzajú z per-jazykového ui.js
+   (src/<lang>/ui.js) — tento súbor sa pri jazykových mutáciách NEMENÍ. */
+const MODULES = [...MODULES_P1, ...MODULES_P2, ...MODULES_P3];
+
+let state = loadState();
+let current = 0;
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { done:{}, quizAnswers:{} };
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+/* počet reálnych modulov (bez welcome) */
+function totalModules(){ return MODULES.filter(m=>!m.welcome).length; }
+function doneCount(){ return Object.keys(state.done).filter(k=>state.done[k]).length; }
+
+function buildNav(){
+  const nav = document.getElementById("nav");
+  nav.innerHTML = "";
+  let lastGroup = null;
+  MODULES.forEach((m,i)=>{
+    if(m.group && m.group !== lastGroup){
+      const gl = document.createElement("div");
+      gl.className = "nav-group-label";
+      gl.textContent = m.group;
+      nav.appendChild(gl);
+      lastGroup = m.group;
+    }
+    const item = document.createElement("div");
+    item.className = "nav-item" + (i===current ? " active":"");
+    const done = state.done[m.id];
+    item.innerHTML =
+      `<span class="nav-num">${m.num}</span>`+
+      `<span>${m.title}</span>`+
+      (done ? `<span class="nav-check">✓</span>` : "");
+    item.onclick = ()=>{ goTo(i); if(window.innerWidth<=860) toggleMenu(false); };
+    nav.appendChild(item);
+  });
+  // progress
+  const dc = doneCount(), tot = totalModules();
+  document.getElementById("prog-label").textContent = UI.progress(dc, tot);
+  document.getElementById("prog-fill").style.width = (tot? (dc/tot*100):0) + "%";
+}
+
+function render(){
+  const c = document.getElementById("content");
+  const m = MODULES[current];
+  let h = `<div class="module active">${m.html}`;
+
+  if(m.quiz){
+    h += renderQuiz(m);
+  }
+
+  // navigačné tlačidlá dole (okrem welcome a projektu, ktoré majú vlastné)
+  if(!m.welcome && !m.project){
+    const prev = current>0 ? `<button class="btn secondary" onclick="goTo(${current-1})">${UI.btnPrev}</button>` : "<span></span>";
+    const next = current<MODULES.length-1 ? `<button class="btn" onclick="goTo(${current+1})">${UI.btnNext}</button>` : "<span></span>";
+    h += `<div class="module-footer">${prev}${next}</div>`;
+  }
+
+  h += `</div>`;
+  c.innerHTML = h;
+  c.scrollTop = 0;
+  window.scrollTo(0,0);
+
+  // ak bol kvíz už vyplnený, obnoviť stav
+  if(m.quiz && state.quizAnswers[m.id]){
+    restoreQuiz(m);
+  }
+  buildNav();
+}
+
+function renderQuiz(m){
+  let h = `<div class="quiz" id="quiz-${m.id}">
+    <div class="quiz-head">${UI.quizHead}</div>
+    <h3>${UI.quizTitle}</h3>
+    <p style="font-size:14px;color:var(--ink-soft)">${UI.quizNeed(m.quiz.pass, m.quiz.questions.length)}</p>`;
+  m.quiz.questions.forEach((q,qi)=>{
+    h += `<div class="q" data-q="${qi}"><div class="q-text">${qi+1}. ${q.q}</div>`;
+    q.opts.forEach((opt,oi)=>{
+      h += `<label class="q-opt" onclick="selectOpt('${m.id}',${qi},${oi})" data-opt="${oi}">${opt}</label>`;
+    });
+    h += `</div>`;
+  });
+  h += `<button class="btn" onclick="submitQuiz('${m.id}')">${UI.quizSubmit}</button>
+    <button class="btn secondary" onclick="resetQuiz('${m.id}')" style="margin-left:8px">${UI.quizRetry}</button>
+    <div class="quiz-result" id="result-${m.id}"></div>
+  </div>`;
+  return h;
+}
+
+let picks = {}; // dočasné výbery {qi: oi}
+
+function selectOpt(mid, qi, oi){
+  const quiz = document.getElementById("quiz-"+mid);
+  if(quiz.classList.contains("locked")) return;
+  const q = quiz.querySelector(`.q[data-q="${qi}"]`);
+  q.querySelectorAll(".q-opt").forEach(o=>o.classList.remove("selected"));
+  q.querySelector(`.q-opt[data-opt="${oi}"]`).classList.add("selected");
+  picks[qi] = oi;
+}
+
+function submitQuiz(mid){
+  const m = MODULES.find(x=>x.id===mid);
+  const quiz = document.getElementById("quiz-"+mid);
+  const total = m.quiz.questions.length;
+  if(Object.keys(picks).length < total){
+    const r = document.getElementById("result-"+mid);
+    r.className = "quiz-result show fail";
+    r.textContent = UI.quizAnswerAll;
+    return;
+  }
+  let correct = 0;
+  m.quiz.questions.forEach((q,qi)=>{
+    const qEl = quiz.querySelector(`.q[data-q="${qi}"]`);
+    qEl.querySelectorAll(".q-opt").forEach(o=>o.classList.add("disabled"));
+    const chosen = picks[qi];
+    if(chosen === q.correct){
+      correct++;
+      qEl.querySelector(`.q-opt[data-opt="${chosen}"]`).classList.add("correct");
+    }else{
+      qEl.querySelector(`.q-opt[data-opt="${chosen}"]`).classList.add("wrong");
+      qEl.querySelector(`.q-opt[data-opt="${q.correct}"]`).classList.add("correct");
+    }
+  });
+  quiz.classList.add("locked");
+  const passed = correct >= m.quiz.pass;
+  const r = document.getElementById("result-"+mid);
+  r.className = "quiz-result show " + (passed?"pass":"fail");
+  r.innerHTML = passed
+    ? UI.quizPass(correct, total, current<MODULES.length-1)
+    : UI.quizFail(correct, total, m.quiz.pass);
+
+  // ulož
+  state.quizAnswers[mid] = {picks:{...picks}, correct, passed};
+  if(passed) state.done[mid] = true;
+  saveState();
+  buildNav();
+}
+
+function restoreQuiz(m){
+  const saved = state.quizAnswers[m.id];
+  if(!saved) return;
+  picks = {...saved.picks};
+  const quiz = document.getElementById("quiz-"+m.id);
+  // znovu vykresli výsledok
+  m.quiz.questions.forEach((q,qi)=>{
+    const qEl = quiz.querySelector(`.q[data-q="${qi}"]`);
+    const chosen = saved.picks[qi];
+    qEl.querySelectorAll(".q-opt").forEach(o=>o.classList.add("disabled"));
+    if(chosen === q.correct){
+      qEl.querySelector(`.q-opt[data-opt="${chosen}"]`).classList.add("correct");
+    }else{
+      if(chosen!=null) qEl.querySelector(`.q-opt[data-opt="${chosen}"]`).classList.add("wrong");
+      qEl.querySelector(`.q-opt[data-opt="${q.correct}"]`).classList.add("correct");
+    }
+  });
+  quiz.classList.add("locked");
+  const r = document.getElementById("result-"+m.id);
+  r.className = "quiz-result show " + (saved.passed?"pass":"fail");
+  r.innerHTML = saved.passed
+    ? UI.quizPassShort(saved.correct, m.quiz.questions.length)
+    : UI.quizFailShort(saved.correct, m.quiz.questions.length, m.quiz.pass);
+}
+
+function resetQuiz(mid){
+  picks = {};
+  delete state.quizAnswers[mid];
+  delete state.done[mid];
+  saveState();
+  render();
+}
+
+function goTo(i){
+  if(i<0 || i>=MODULES.length) return;
+  current = i;
+  picks = {};
+  render();
+}
+
+function markProject(){
+  state.done["projekt"] = true;
+  saveState();
+  buildNav();
+  const btn = event.target;
+  btn.textContent = UI.projectDone;
+  btn.disabled = true;
+  btn.style.opacity = ".6";
+}
+
+function resetProgress(){
+  if(confirm(UI.resetConfirm)){
+    state = { done:{}, quizAnswers:{} };
+    saveState();
+    goTo(0);
+  }
+}
+
+function toggleMenu(force){
+  const sb = document.getElementById("sidebar");
+  if(force===false){ sb.classList.remove("open"); return; }
+  sb.classList.toggle("open");
+}
+
+// štart — obnov posledný modul (voliteľné: začni od welcome)
+document.addEventListener("DOMContentLoaded", ()=>{
+  buildNav();
+  render();
+});
+
+</script>
+</body>
+</html>
