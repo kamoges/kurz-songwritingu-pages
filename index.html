@@ -109,6 +109,8 @@
     color:var(--accent-2);margin:2px 4px 2px 0}
   a.example-artist{text-decoration:none;transition:border-color .15s,color .15s,background .15s}
   a.example-artist::after{content:" ▶";font-size:9px;color:var(--gold)}
+  a.example-artist.suno{color:var(--accent);border-color:var(--accent)}
+  a.example-artist.suno::after{content:" ♪";font-size:11px;color:var(--accent)}
   a.example-artist:hover{border-color:var(--accent);color:var(--accent);background:#fff}
 
   /* ---------- QUIZ ---------- */
@@ -230,7 +232,8 @@ const UI = {
   btnNext: "Ďalší modul →",
   projectDone: "Projekt dokončený ✓",
   resetConfirm: "Naozaj vynulovať celý postup? Táto akcia sa nedá vrátiť.",
-  artistLinkTitle: "Ukážka na YouTube (otvorí sa v novom okne)"
+  artistLinkTitle: "Ukážka na YouTube (otvorí sa v novom okne)",
+  sunoLinkTitle: "Vypočuj si skladbu Leily K na Suno (otvorí sa v novom okne)"
 };
 
 /* Overené YouTube odkazy interpretov (schválené používateľom, 2026-07).
@@ -260,6 +263,28 @@ const ARTIST_LINKS = {
   "Zuzana Homolová": "https://www.youtube.com/watch?v=Dsh_y1vA300",
   "Ursiny": "https://www.youtube.com/watch?v=GKTL3ugJbJY",
   "Filip": "https://www.youtube.com/watch?v=1V3Q7UXZV0I"
+};
+
+/* Suno odkazy na skladby Leily K (dodal používateľ, 2026-07-14).
+   Kľúč = názov skladby; štítok sa zlinkuje, ak je text štítku presne názov
+   skladby, alebo končí na „— <názov>“ (formát „Leila K — <názov>“).
+   „Nádych a výdych“ zatiaľ nemá v kurze štítok — odkaz je pripravený. */
+const LEILA_LINKS = {
+  "Tulák": "https://suno.com/s/BnWfJYHltx0j1RBu",
+  "Len jeden deň": "https://suno.com/s/0CT4rVZ1AKNyhuOu",
+  "Dieťa sídliska": "https://suno.com/s/KOKYUf45BkQGBDPS",
+  "Zrkadlá": "https://suno.com/s/XTJ6oQJZfvz399Zu",
+  "Druhý pokus": "https://suno.com/s/DSLfYy7eu2eoy68Q",
+  "Nádych a výdych": "https://suno.com/s/kxDDmM2eLSOsrBHl",
+  "Ahoj, ja som Leila": "https://suno.com/s/zCycpASYAasohlGo",
+  "Dievča": "https://suno.com/s/kjzOL6EdgYqRTkAM",
+  "Zapletený do teba": "https://suno.com/s/ewODgiqItkPCYXUE",
+  "Štyri hlavy": "https://suno.com/s/NXjtmRr1dqOyHRWK",
+  "Je čas": "https://suno.com/s/HO4LmbKaPMDgYW1Q",
+  "Vzal to čas": "https://suno.com/s/qsLbehYacHdiJjrU",
+  "Instantný život": "https://suno.com/s/BPvSCL1NWIXGEqux",
+  "Blázon": "https://suno.com/s/IFaDqFo5uNNgOKoe",
+  "Digitálny race": "https://suno.com/s/C3tMIStilGYRM7ba"
 };
 
 /* ================= OBSAH KURZU — ČASŤ 1 (moduly 0–3) ================= */
@@ -1545,6 +1570,7 @@ Ktorí vypadli z hniezda
 Skúsme si spolu niečo želať
 Kým na zem dopadne hviezda</div>
     <p>Tú istú sekciu potom zopakuješ na ďalších miestach — Suno podľa štruktúrnych tagov pochopí, čo je refrén, a dá mu vrcholnú melódiu.</p>
+    <p><span class="example-artist">Leila K — Druhý pokus</span></p>
 
     <h2>Kompletný príklad (folk pre slovenčinu)</h2>
     <div class="lyric">[Intro | fingerpicked acoustic guitar | intimate mic]
@@ -1794,21 +1820,33 @@ function renderQuiz(m){
   return h;
 }
 
-/* Štítky .example-artist zmení na odkazy podľa per-jazykovej mapy ARTIST_LINKS
-   (definovaná v ui.js; ak chýba, štítky ostanú obyčajné — jazyk bez odkazov funguje). */
+/* Štítky .example-artist zmení na odkazy podľa per-jazykových máp:
+   - ARTIST_LINKS (YouTube interpretov): text štítku ZAČÍNA kľúčom
+   - LEILA_LINKS (Suno skladby Leily K): text štítku JE názov skladby,
+     alebo končí na „— <názov>“ (formát „Leila K — <názov>“)
+   Ak mapy chýbajú, štítky ostanú obyčajné — jazyk bez odkazov funguje. */
 function linkifyArtists(root){
-  if(typeof ARTIST_LINKS === "undefined") return;
-  const keys = Object.keys(ARTIST_LINKS);
+  const artists = (typeof ARTIST_LINKS !== "undefined") ? ARTIST_LINKS : null;
+  const leila = (typeof LEILA_LINKS !== "undefined") ? LEILA_LINKS : null;
+  if(!artists && !leila) return;
   root.querySelectorAll("span.example-artist").forEach(el=>{
     const t = el.textContent.trim();
-    const key = keys.find(k=>t.startsWith(k));
-    if(!key) return;
+    let href = null, cls = "example-artist", title = "";
+    if(artists){
+      const k = Object.keys(artists).find(k=>t.startsWith(k));
+      if(k){ href = artists[k]; title = (typeof UI!=="undefined" && UI.artistLinkTitle) || ""; }
+    }
+    if(!href && leila){
+      const k = Object.keys(leila).find(k=>t===k || t.endsWith("— "+k));
+      if(k){ href = leila[k]; cls += " suno"; title = (typeof UI!=="undefined" && UI.sunoLinkTitle) || ""; }
+    }
+    if(!href) return;
     const a = document.createElement("a");
-    a.className = "example-artist";
-    a.href = ARTIST_LINKS[key];
+    a.className = cls;
+    a.href = href;
     a.target = "_blank";
     a.rel = "noopener";
-    a.title = (typeof UI!=="undefined" && UI.artistLinkTitle) ? UI.artistLinkTitle : "";
+    a.title = title;
     a.innerHTML = el.innerHTML;
     el.replaceWith(a);
   });
