@@ -107,6 +107,9 @@
   .example-artist{display:inline-block;background:var(--paper-2);border:1px solid var(--line);
     border-radius:20px;padding:2px 12px;font-size:13px;font-family:'Courier New',monospace;
     color:var(--accent-2);margin:2px 4px 2px 0}
+  a.example-artist{text-decoration:none;transition:border-color .15s,color .15s,background .15s}
+  a.example-artist::after{content:" ▶";font-size:9px;color:var(--gold)}
+  a.example-artist:hover{border-color:var(--accent);color:var(--accent);background:#fff}
 
   /* ---------- QUIZ ---------- */
   .quiz{background:var(--card);border:2px solid var(--accent);border-radius:8px;
@@ -226,7 +229,37 @@ const UI = {
   btnPrev: "← Späť",
   btnNext: "Ďalší modul →",
   projectDone: "Projekt dokončený ✓",
-  resetConfirm: "Naozaj vynulovať celý postup? Táto akcia sa nedá vrátiť."
+  resetConfirm: "Naozaj vynulovať celý postup? Táto akcia sa nedá vrátiť.",
+  artistLinkTitle: "Ukážka na YouTube (otvorí sa v novom okne)"
+};
+
+/* Overené YouTube odkazy interpretov (schválené používateľom, 2026-07).
+   Kľúč = začiatok textu štítku .example-artist; app.js štítky automaticky
+   zmení na odkazy. Štítky bez záznamu (napr. Leila K, básnici) ostávajú
+   nekliknuteľné. Offline použitie kurzu to neovplyvní. */
+const ARTIST_LINKS = {
+  "Jana Kirschner": "https://www.youtube.com/watch?v=SAuLBciZ4qI",
+  "Pokáč": "https://www.youtube.com/watch?v=k0ovrq2fNOY",
+  "Miro Žbirka": "https://www.youtube.com/watch?v=zTD51KfsFEY",
+  "Elán": "https://www.youtube.com/watch?v=ryl1XEwg3c8",
+  "Horkýže Slíže": "https://www.youtube.com/watch?v=89YFb7qQyy8",
+  "Kontrafakt": "https://www.youtube.com/watch?v=SRmeDpgJvsw",
+  "Richard Müller": "https://www.youtube.com/watch?v=XgI5TJDtmS8",
+  "Michal Hrůza": "https://www.youtube.com/watch?v=tAYVEm4ZoDg",
+  "Peter Bič Project": "https://www.youtube.com/watch?v=k5gfgE-jirY",
+  "Iné Kafe": "https://www.youtube.com/watch?v=3-VIvaNBDKI",
+  "Para": "https://www.youtube.com/watch?v=wCI6rEWQXIA",
+  "Hex": "https://www.youtube.com/watch?v=dWEWTl1Ko78",
+  "Zuzana Smatanová": "https://www.youtube.com/watch?v=X3BYYdJIKHM",
+  "Peha": "https://www.youtube.com/watch?v=fI0iRdZnaXk",
+  "Celeste Buckingham": "https://www.youtube.com/watch?v=V8CQjV8vXJE",
+  "Longital": "https://www.youtube.com/watch?v=qDFLzs-CIc0",
+  "Rytmus": "https://www.youtube.com/watch?v=s6aBseA09LE",
+  "Separ": "https://www.youtube.com/watch?v=ji3WXp6Yx9c",
+  "Vec": "https://www.youtube.com/watch?v=ME_w5ZkFm2U",
+  "Zuzana Homolová": "https://www.youtube.com/watch?v=Dsh_y1vA300",
+  "Ursiny": "https://www.youtube.com/watch?v=GKTL3ugJbJY",
+  "Filip": "https://www.youtube.com/watch?v=1V3Q7UXZV0I"
 };
 
 /* ================= OBSAH KURZU — ČASŤ 1 (moduly 0–3) ================= */
@@ -1731,6 +1764,7 @@ function render(){
 
   h += `</div>`;
   c.innerHTML = h;
+  linkifyArtists(c);
   c.scrollTop = 0;
   window.scrollTo(0,0);
 
@@ -1758,6 +1792,26 @@ function renderQuiz(m){
     <div class="quiz-result" id="result-${m.id}"></div>
   </div>`;
   return h;
+}
+
+/* Štítky .example-artist zmení na odkazy podľa per-jazykovej mapy ARTIST_LINKS
+   (definovaná v ui.js; ak chýba, štítky ostanú obyčajné — jazyk bez odkazov funguje). */
+function linkifyArtists(root){
+  if(typeof ARTIST_LINKS === "undefined") return;
+  const keys = Object.keys(ARTIST_LINKS);
+  root.querySelectorAll("span.example-artist").forEach(el=>{
+    const t = el.textContent.trim();
+    const key = keys.find(k=>t.startsWith(k));
+    if(!key) return;
+    const a = document.createElement("a");
+    a.className = "example-artist";
+    a.href = ARTIST_LINKS[key];
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.title = (typeof UI!=="undefined" && UI.artistLinkTitle) ? UI.artistLinkTitle : "";
+    a.innerHTML = el.innerHTML;
+    el.replaceWith(a);
+  });
 }
 
 let picks = {}; // dočasné výbery {qi: oi}
