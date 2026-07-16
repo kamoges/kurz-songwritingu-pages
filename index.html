@@ -1839,7 +1839,8 @@ function linkifyArtists(root){
       if(k){ href = artists[k]; title = (typeof UI!=="undefined" && UI.artistLinkTitle) || ""; }
     }
     if(!href && leila){
-      const k = Object.keys(leila).find(k=>t===k || t.endsWith("— "+k));
+      // presný názov, alebo „<prefix> — názov“ / „<prefix> - názov“ / „<prefix> – názov“
+      const k = Object.keys(leila).find(k=>t===k || t.endsWith("— "+k) || t.endsWith("- "+k) || t.endsWith("– "+k));
       if(k){ href = leila[k]; cls += " suno"; title = (typeof UI!=="undefined" && UI.sunoLinkTitle) || ""; }
     }
     if(!href) return;
