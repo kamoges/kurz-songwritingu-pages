@@ -1824,9 +1824,9 @@ function renderQuiz(m){
 
 /* Štítky .example-artist zmení na odkazy podľa per-jazykových máp:
    - ARTIST_LINKS (YouTube interpretov): text štítku ZAČÍNA kľúčom
-   - LEILA_LINKS (Suno skladby Leily K): text štítku JE názov skladby,
-     alebo končí na „— <názov>“ (formát „Leila K — <názov>“)
-   Ak mapy chýbajú, štítky ostanú obyčajné — jazyk bez odkazov funguje. */
+   - LEILA_LINKS (Suno skladby Leila's poems): text štítku JE názov skladby,
+     alebo končí na „- <názov>“ (formát „Leila's poems - <názov>“)
+   Ak mapy chýbajú, štítky ostanú obyčajné - jazyk bez odkazov funguje. */
 function linkifyArtists(root){
   const artists = (typeof ARTIST_LINKS !== "undefined") ? ARTIST_LINKS : null;
   const leila = (typeof LEILA_LINKS !== "undefined") ? LEILA_LINKS : null;
