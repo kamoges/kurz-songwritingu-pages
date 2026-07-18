@@ -46,9 +46,11 @@
   .content{flex:1;max-width:820px;margin:0 auto;padding:48px 40px 120px}
 
   /* ---------- SIDEBAR ---------- */
+  .brand-row{display:flex;gap:12px;align-items:center;margin-bottom:22px}
+  .side-logo{height:56px;width:auto;flex-shrink:0}
   .brand{font-family:'Courier New',monospace;font-size:12px;letter-spacing:2px;
     text-transform:uppercase;color:var(--accent);margin-bottom:6px}
-  .brand-title{font-size:22px;line-height:1.25;margin-bottom:22px;font-weight:normal}
+  .brand-title{font-size:22px;line-height:1.25;font-weight:normal}
   .brand-title b{font-weight:bold}
   .progress-box{background:var(--card);border:1px solid var(--line);
     border-radius:var(--radius);padding:12px 14px;margin-bottom:22px;font-size:13px}
@@ -175,6 +177,22 @@
   .reset-link{font-size:12px;color:var(--ink-soft);text-decoration:underline;cursor:pointer;
     display:inline-block;margin-top:14px;font-family:'Courier New',monospace}
 
+  /* ---------- PÄTA ---------- */
+  .site-footer{background:linear-gradient(180deg,#262047,#1b1735);color:#d9d2ec;
+    padding:46px 40px 26px;border-top:3px solid var(--accent)}
+  .footer-grid{max-width:860px;margin:0 auto;display:grid;
+    grid-template-columns:1.3fr 1fr 1fr;gap:32px;align-items:start}
+  .footer-logo{height:120px;width:auto;filter:invert(1);opacity:.95}
+  .footer-tagline{font-style:italic;color:#b7aed6;margin-top:8px;font-size:15px}
+  .footer-head{font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;
+    text-transform:uppercase;color:#f0b25c;margin-bottom:10px}
+  .footer-grid p{margin:0 0 8px;font-size:14px;color:#cfc8e8}
+  .site-footer a{color:#fff;text-decoration:underline;text-decoration-thickness:1px;
+    text-underline-offset:3px}
+  .site-footer a:hover{color:#f0b25c}
+  .footer-bottom{max-width:860px;margin:28px auto 0;padding-top:16px;
+    border-top:1px solid rgba(255,255,255,.14);font-size:13px;color:#a79ecb}
+
   /* ---------- MOBILE ---------- */
   .menu-toggle{display:none}
   @media(max-width:860px){
@@ -190,6 +208,8 @@
     h1{font-size:30px}.hero h1{font-size:36px}.lede{font-size:17px}
     h2{font-size:22px}
     .hero{padding:44px 22px 40px}
+    .footer-grid{grid-template-columns:1fr;gap:24px}
+    .site-footer{padding:34px 22px 22px}
   }
 </style>
 </head>
@@ -197,10 +217,15 @@
 <button class="menu-toggle" onclick="toggleMenu()">☰ &nbsp;Obsah kurzu</button>
 <div class="wrap">
   <aside class="sidebar" id="sidebar">
-    <div class="brand">Kurz songwritingu</div>
-    <div class="brand-title">Ako písať texty,<br>ktoré <b>zaznejú</b></div>
+    <div class="brand-row">
+      <img class="side-logo" src="assets/logo-emblem.png" alt="Leila's poems">
+      <div>
+        <div class="brand">Kurz songwritingu</div>
+        <div class="brand-title">Ako písať texty,<br>ktoré <b>zaznejú</b></div>
+      </div>
+    </div>
     <div class="progress-box">
-      <div>Tvoj postup: <b id="prog-label">0 / 18 modulov</b></div>
+      <div>Tvoj postup: <b id="prog-label">0 / 19 modulov</b></div>
       <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
     </div>
     <nav id="nav"></nav>
@@ -209,6 +234,25 @@
 
   <main class="content" id="content"></main>
 </div>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <img class="footer-logo" src="assets/logo-full.png" alt="Leila's poems">
+      <div class="footer-tagline">Poézia, ktorá znie</div>
+    </div>
+    <div>
+      <div class="footer-head">Kontakt</div>
+      <p><a href="mailto:leilas.poems@gmail.com">leilas.poems@gmail.com</a></p>
+    </div>
+    <div>
+      <div class="footer-head">O kurze</div>
+      <p>Verzia kurzu 1.9 · slovenská</p>
+      <p>Optimalizované pre Suno AI v5.5</p>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 Leila's poems · Texty piesní sú autorským dielom autora.</div>
+</footer>
 
 <script>
 /* ================= UI REŤAZCE + KONFIG JAZYKA (SK) =================
@@ -341,7 +385,7 @@ const MODULES_P1 = [
     <p><strong>Výsledok:</strong> vlastná dokončená pieseň od nápadu po hotovú skladbu.</p>
 
     <h2>Ako kurz funguje</h2>
-    <p>Kurz má <strong>18 modulov</strong> vrátane záverečného vlastného projektu. Každý modul obsahuje teóriu, konkrétne príklady zo slovenskej a českej scény, príklady realizácie konkrétnych zhudobnených textov v Suno AI od Leila's poems a na záver krátky test. Odporúčam prechádzať ich v poradí, každý stavia na predchádzajúcom.</p>
+    <p>Kurz má <strong>19 modulov</strong> vrátane záverečného vlastného projektu. Každý modul obsahuje teóriu, konkrétne príklady zo slovenskej a českej scény, príklady realizácie konkrétnych zhudobnených textov v Suno AI od Leila's poems a na záver krátky test. Odporúčam prechádzať ich v poradí, každý stavia na predchádzajúcom.</p>
     <p>Tvoj postup sa ukladá automaticky v tomto prehliadači. Keď dokončíš test a overíš výsledok, modul sa označí zelenou farbou. Môžeš sa kedykoľvek vrátiť a pokračovať tam, kde si skončil.</p>
     <div class="callout tip">
       <div class="callout-label">Ako sa učiť</div>
@@ -1289,9 +1333,80 @@ Kto ti dá za post lajk</div>
   }
 },
 {
-  id:"suno", group:"Prax a Suno", num:"9", title:"Základy Suno v5.5",
+  id:"suno-principy", group:"Prax a Suno", num:"9", title:"Ako Suno rozmýšľa",
   html:`
     <div class="eyebrow">Modul 9 · Prax a Suno</div>
+    <h1>Ako Suno rozmýšľa — päť princípov</h1>
+    <p class="lede">Skôr než začneš písať prompty, pochop, čo sa deje na druhej strane. Z piatich princípov správania modelu sa dá odvodiť každé pravidlo, ktoré ťa čaká v ďalších moduloch — a aj tie, ktoré si raz budeš musieť vymyslieť sám.</p>
+
+    <h2>Kormidlovanie, nie prikazovanie</h2>
+    <p>Suno nie je skladateľ, ktorý tvoje zadanie prečíta, pochopí a vykoná. Je to model, ktorý generuje zvuk kúsok po kúsku na základe pravdepodobností naučených z miliónov nahrávok. Tvoj prompt preň nie je príkaz — je to <strong>súradnica v krajine</strong>, ktorú si model vytvoril z trénovacích dát. Ty určíš miesto, z ktorého sa spustí lavína pravdepodobností; zvyšok už riadi krajina sama.</p>
+    <div class="callout tip">
+      <div class="callout-label">Kartografia namiesto formulácie</div>
+      <p style="margin:0">Umenie promptovania preto nie je umenie krásnej formulácie, ale umenie <strong>kartografie</strong>: vedieť, kde v krajine leží zvuk, ktorý chceš, a akými slovami sa to miesto v trénovacích dátach volalo.</p>
+    </div>
+
+    <h2>Princíp 1 — Model pozná len jazyk metadát</h2>
+    <p>Model reaguje na frázy, ktorými ľudia reálne popisujú nahrávky — tagy, recenzie, playlisty. Také frázy majú v jeho „krajine" husté, jasné susedstvo. Vlastný poetický opis sa rozpadne na fragmenty a výsledok sa rozmaže do priemeru.</p>
+    <div class="lyric">Zle:   zádumčivá gitara ako spomienka na dážď
+Dobre: melancholic fingerpicked guitar, lo-fi, tape hiss</div>
+    <p><strong>Odvodené pravidlá:</strong> style prompt píš po anglicky (metadáta nahrávok sú prevažne anglické) · používaj zavedené žánrové a produkčné termíny, éry a scény („70s Laurel Canyon") · keď prompt nefunguje, nepridávaj poetiku — spýtaj sa, ako by to nazval hudobný recenzent alebo tag na Bandcampe.</p>
+
+    <h2>Princíp 2 — Negácia neexistuje</h2>
+    <p>„No drums" model často pochopí opačne: slovo <em>drums</em> posunie generovanie k bicím a slovo <em>no</em> nemá v krajine žiadnu operáciu odčítania. Krajina vie asociácie sčítavať, nie popierať.</p>
+    <div class="lyric">Zle:   no drums, not aggressive
+Dobre: sparse arrangement, solo piano and voice, gentle restrained dynamics</div>
+    <p><strong>Odvodené pravidlo:</strong> nepíš, čo nechceš — <strong>preklop to pozitívne</strong> na to, čo chceš. Výnimkou je pole <em>Exclude styles</em>: to nie je negácia vo vete, ale samostatný filter („drž sa ďalej od tejto oblasti"), preto funguje spoľahlivo — podrobne v Module 9b.</p>
+
+    <h2>Princíp 3 — Atraktory vyhrávajú</h2>
+    <p>Krajina má hlboké údolia: štruktúra verš–refrén, štvordobý takt, štandardné dĺžky fráz. Generovanie do nich samovoľne skĺzava. Meta tagy ako <code>[Chorus]</code> nie sú príkazy, ale mäkké postrčenia — fungujú tým lepšie, čím menej idú proti tomu, čo by model spravil aj tak.</p>
+    <p><strong>Odvodené pravidlo:</strong> pracuj s atraktorom, nie proti nemu. Keď chceš gradáciu, nebojuj s tým, že model chce refrén — umiestni svoj vrchol tam, kam refrén prirodzene spadne. Experimentálna štruktúra = počítaj s viacerými pokusmi.</p>
+
+    <h2>Princíp 4 — Text piesne je najsilnejší nástroj</h2>
+    <p>Model sa text naozaj snaží spievať, slabiku po slabike. Dĺžky veršov, rozloženie prízvukov a zalomenia riadkov preto formujú rytmus a frázovanie <strong>viac než čokoľvek v style prompte</strong> — text nie je dekorácia nad hudbou, text je kostra, okolo ktorej sa hudba generuje.</p>
+    <p><strong>Odvodené pravidlá:</strong> pomalšiu pieseň dosiahneš skôr dlhšími veršami než BPM údajom · údernosť dosiahneš krátkymi, prízvukovo hustými riadkami · kde zalomíš verš, tam model často urobí frázovú pauzu. Presne preto sme v Moduloch 2 a 4 toľko riešili slabiky a prízvuky.</p>
+
+    <h2>Princíp 5 — Riedenie (dilution)</h2>
+    <p>Pozornosť modelu má obmedzenú kapacitu. Desať deskriptorov sa navzájom riedi; tri až päť ostrých sa presadí. „Sad, melancholic, sorrowful, wistful" nie je štyrikrát silnejšie — je to jeden rozmazaný smer.</p>
+    <p><strong>Odvodené pravidlá:</strong> 3–5 silných deskriptorov, žiadne synonymá · najdôležitejšie (žáner, nálada) na začiatok · keď prompt nefunguje, prvý inštinkt je <strong>odoberať, nie pridávať</strong>.</p>
+
+    <div class="callout tip">
+      <div class="callout-label">Odvoď si, nememoruj</div>
+      <p style="margin:0">Väčšina „zaručených trikov" z komunít je len konkrétny prípad týchto princípov. Príklad: chceš inštrumentálnu medzihru bez spevu. Princíp 4 hovorí: v texte na tom mieste nesmie byť žiadny riadok. Princíp 3: tag <code>[Instrumental Break]</code> pomôže, ale nie je záruka. Princíp 1: do štýlu patrí pozitívny popis („instrumental section, lead guitar takes over"). Tri princípy, jedno riešenie — žiadny memorovaný trik.</p>
+    </div>
+
+    <h2>Generácie Suno — od v4.5-all po v5.5</h2>
+    <p>Sila princípov nie je konštantná — medzi verziami sa posúva. Pravidlá zastarajú s každou verziou; princípy zostávajú, len menia váhu.</p>
+    <table>
+      <tr><th>Verzia</th><th>Čo priniesla</th><th>Pre teba</th></tr>
+      <tr><td><strong>v4.5 / v4.5+</strong><br>(žije ako „v4.5-all", zadarmo)</td><td>rozšírený slovník štýlov, žánrové fúzie, miernejšie riedenie</td><td>referenčný bod, ak tvoríš bez predplatného; princípy 2 a 5 tu platia tvrdšie</td></tr>
+      <tr><td><strong>v5</strong><br>(jeseň 2025)</td><td>dospelá kompozícia — koherencia, skutočná gradácia, prirodzenejšie vokály</td><td>atraktory sú hlbšie, ale žánrovo autentickejšie — vybočiť zo žánru chce presnejší prompt</td></tr>
+      <tr><td><strong>v5.5</strong><br>(marec 2026)</td><td><strong>Voices</strong> (vlastný hlas), <strong>Custom Models</strong> (dotrénovanie na ≥6 vlastných skladbách), <strong>My Taste</strong> (učí sa tvoj vkus)</td><td>zvláda držané tóny, intímnu dynamiku a dych — presne územie slovenskej lyriky; celý tento kurz je ladený na v5.5</td></tr>
+    </table>
+    <p>Staršie verzie (v2–v4) boli o tom, že krajina vôbec vznikla a naučila sa znieť — pre dnešnú prax už nie sú podstatné.</p>
+    <div class="callout warn">
+      <div class="callout-label">Archivuj si stemy</div>
+      <p style="margin:0">Po dohode Suno × Warner Music sa staršie modely postupne vyraďujú a koncom 2026 ich nahradia nové, licencované. Ak máš projekty závislé od konkrétnej verzie modelu, <strong>archivuj si stemy a finálne exporty už teraz</strong> — rovnaký zvuk sa po výmene modelu nemusí dať zreprodukovať.</p>
+    </div>
+  `,
+  quiz:{
+    pass:3,
+    questions:[
+      {q:"Čo v skutočnosti robí style prompt?",
+       opts:["Je to príkaz, ktorý model vykoná","Zadáva súradnice v krajine pravdepodobností — určuje, odkiaľ model začne generovať","Nastavuje hlasitosť","Prekladá text do angličtiny"],correct:1},
+      {q:"Ako správne dosiahneš skladbu bez bicích?",
+       opts:["Napíšeš „no drums“","Pozitívne preklopíš: „sparse arrangement, solo piano and voice“","Napíšeš to veľkými písmenami","Zopakuješ „no drums“ trikrát"],correct:1},
+      {q:"Prečo sa style prompt píše po anglicky?",
+       opts:["Angličtina je magická","Model sa učil na prevažne anglických hudobných metadátach — slovenský opis nemá v krajine husté susedstvo","Suno slovenčinu zakazuje","Kvôli počtu znakov"],correct:1},
+      {q:"Prompt nefunguje. Aký je prvý správny inštinkt?",
+       opts:["Pridať viac synoným","Odoberať — nájsť 3–5 deskriptorov, ktoré nesú identitu zvuku, a zvyšok zmazať","Prepnúť na staršiu verziu","Napísať prompt po slovensky"],correct:1}
+    ]
+  }
+},
+{
+  id:"suno", group:"Prax a Suno", num:"9a", title:"Základy Suno v5.5",
+  html:`
+    <div class="eyebrow">Modul 9a · Prax a Suno</div>
     <h1>Optimalizácia textu pre Suno v5.5</h1>
     <p class="lede">Máš dobrý text. Teraz ho treba pripraviť tak, aby ho model zaspieval presne tak, ako počuješ v hlave. Základom je pochopiť, že Suno má dve oddelené „mozgy".</p>
 
@@ -1307,7 +1422,7 @@ Kto ti dá za post lajk</div>
     </table>
     <div class="callout warn">
       <div class="callout-label">Kľúčové pravidlo polí</div>
-      <p style="margin:0">Znak <code>|</code> (pipe) patrí <strong>výhradne</strong> do poľa Lyrics (na stacking tagov). V poli Style spôsobuje kolaps — tam vždy nový riadok a čiarky. Podrobne o oboch poliach v moduloch 9a a 9b.</p>
+      <p style="margin:0">Znak <code>|</code> (pipe) patrí <strong>výhradne</strong> do poľa Lyrics (na stacking tagov). V poli Style spôsobuje kolaps — tam vždy nový riadok a čiarky. Podrobne o oboch poliach v moduloch 9b a 9c.</p>
     </div>
 
     <h2>Tri syntaktické nástroje — kritické rozlíšenie</h2>
@@ -1394,9 +1509,9 @@ Voice gender: female</div>
   }
 },
 {
-  id:"suno-style", group:"Prax a Suno", num:"9a", title:"Style prompty do hĺbky",
+  id:"suno-style", group:"Prax a Suno", num:"9b", title:"Style prompty do hĺbky",
   html:`
-    <div class="eyebrow">Modul 9a · Prax a Suno</div>
+    <div class="eyebrow">Modul 9b · Prax a Suno</div>
     <h1>Style prompty do hĺbky</h1>
     <p class="lede">Style prompt je globálny „mozog" piesne. Rozhoduje o žánri, hlase a produkcii. Tu sa naučíš napísať ho tak, aby výsledok nebol generický AI zvuk, ale konkrétny charakter.</p>
 
@@ -1447,6 +1562,10 @@ natural Slovak stress and vowel length respected</div>
     <h2>Negatívne prompty — dva nástroje</h2>
     <p><strong>1. Inline <code>no</code></strong> (na konci tela promptu) — vylučuje konkrétne prvky: <code>no autotune, no reverb wash</code>. Táto dvojica je najsilnejšia kombinácia pre organický, „neumelý" zvuk.</p>
     <p><strong>2. Exclude styles blok</strong> (za hlavným promptom) — vylučuje celé žánre: <code>Exclude styles: jazz, EDM, drum machine, auto-tune</code>. Negatívne tagy vždy až na koniec.</p>
+    <div class="callout">
+      <div class="callout-label">Prečo to funguje (Modul 9, princíp 2)</div>
+      <p style="margin:0">Sú to dva rôzne mechanizmy. <strong>Exclude styles</strong> nie je negácia vo vete — je to samostatný filter, ktorý modelu povie „drž sa ďalej od tejto oblasti", preto funguje spoľahlivo; patrí naň žánre a produkčné skupiny. <strong>Inline <code>no</code></strong> je slabšia sémantická negácia — na v5.5 funguje preto, že frázy ako <code>no autotune</code> či <code>dry vocals</code> sú zabehnuté v hudobných metadátach; patrí naň konkrétne efekty. <strong>Pozitívne preklopenie má vždy prednosť</strong> (<code>dry vocals, close-mic</code> namiesto <code>no reverb</code>) a pozor na dlhé reťazce <code>no</code>-tagov — posledné v rade nesú najmenej váhy.</p>
+    </div>
 
     <h2>Zakázaný obsah v Style poli</h2>
     <div class="callout warn">
@@ -1501,9 +1620,9 @@ This is a duet between [A] (male) and [B] (female), [žáner]
   }
 },
 {
-  id:"suno-tagy", group:"Prax a Suno", num:"9b", title:"Delivery a meta tagy",
+  id:"suno-tagy", group:"Prax a Suno", num:"9c", title:"Delivery a meta tagy",
   html:`
-    <div class="eyebrow">Modul 9b · Prax a Suno</div>
+    <div class="eyebrow">Modul 9c · Prax a Suno</div>
     <h1>Delivery a meta tagy v Lyrics poli</h1>
     <p class="lede">Meta tagy sú inštrukcie v hranatých zátvorkách priamo v texte. Hovoria modelu, ako má každá sekcia znieť — namiesto dúfania, že to uhádne.</p>
 
@@ -1523,6 +1642,7 @@ This is a duet between [A] (male) and [B] (female), [žáner]
 
     <h2>Sekčné tagy (Suno v5.5)</h2>
     <p>Akceptované sekcie: <code>Intro · Verse · Pre-Chorus · Chorus · Post-Chorus · Bridge · Break · Breakdown · Build · Drop · Interlude · Outro · Hook · Refrain · Solo · Instrumental · Rap Verse · End · Fade Out · Final Chorus</code>.</p>
+    <p>Pamätaj (Modul 9, princíp 3): tagy sú <strong>mäkké signály, nie príkazy</strong> — fungujú tým spoľahlivejšie, čím menej idú proti prirodzenému toku skladby. <code>[Chorus]</code> po dvoch veršoch sadne takmer vždy; náhly žánrový zlom uprostred skladby zriedka.</p>
     <p>Záverečné tagy riešia loopovanie: <code>[End]</code> (presné miesto konca), <code>[Fade Out]</code> (postupné vyznenie), <code>[Final Chorus]</code> (klimaktický záver).</p>
 
     <h2>Emotion / delivery tagy</h2>
