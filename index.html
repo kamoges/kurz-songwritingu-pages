@@ -6,6 +6,14 @@
 <title>Kurz songwritingu - písanie textov pre zhudobnenie</title>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <style>
+  /* Značkové fonty leilaspoems (self-hosted, latin + latin-ext pre SK/CZ) */
+  @font-face{font-family:'Atkinson Hyperlegible';font-style:normal;font-weight:400;font-display:swap;src:url('assets/atkinson-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  @font-face{font-family:'Atkinson Hyperlegible';font-style:normal;font-weight:400;font-display:swap;src:url('assets/atkinson-400-latinext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+  @font-face{font-family:'Atkinson Hyperlegible';font-style:normal;font-weight:700;font-display:swap;src:url('assets/atkinson-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  @font-face{font-family:'Atkinson Hyperlegible';font-style:normal;font-weight:700;font-display:swap;src:url('assets/atkinson-700-latinext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+  @font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:400 800;font-display:swap;src:url('assets/bricolage-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  @font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:400 800;font-display:swap;src:url('assets/bricolage-latinext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
   :root{
     --paper:#f6f1e7;
     --paper-2:#efe8d8;
@@ -20,16 +28,24 @@
     --ok:#2f7d4f;
     --bad:#b23a2e;
     --radius:4px;
+    /* Zjednotené značkové fonty (nahrádzajú "zapečené" Georgia / Courier New) */
+    --font-body:'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif;
+    --font-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+    --font-label:'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{
-    font-family:Georgia,'Times New Roman',serif;
+    font-family:var(--font-body);
     background:var(--paper);
     color:var(--ink);
     line-height:1.7;
     -webkit-font-smoothing:antialiased;
   }
+  /* Nadpisy v display fonte (Bricolage); malé technické labely ostávajú v --font-label */
+  h1,h2,h3,h4,.brand-title,.hero h1{font-family:var(--font-display)}
+  h1,h2,.hero h1{font-weight:700;letter-spacing:-.02em}
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
   /* jemná linajková textúra na pozadí */
   body::before{
     content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
@@ -47,8 +63,8 @@
 
   /* ---------- SIDEBAR ---------- */
   .brand-row{display:flex;gap:12px;align-items:center;margin-bottom:22px}
-  .side-logo{height:75px;width:auto;flex-shrink:0}
-  .brand{font-family:'Courier New',monospace;font-size:12px;letter-spacing:2px;
+  .side-logo{height:65px;width:auto;flex-shrink:0}
+  .brand{font-family:var(--font-label);font-size:12px;letter-spacing:2px;
     text-transform:uppercase;color:var(--accent);margin-bottom:6px}
   .brand-title{font-size:22px;line-height:1.25;font-weight:normal}
   .brand-title b{font-weight:bold}
@@ -61,11 +77,11 @@
   .nav-item:hover{background:rgba(156,43,99,.07);color:var(--ink)}
   .nav-item.active{background:var(--accent);color:#fff}
   .nav-item.active .nav-num{color:#fff;border-color:rgba(255,255,255,.5)}
-  .nav-num{font-family:'Courier New',monospace;font-size:11px;width:22px;height:22px;flex-shrink:0;
+  .nav-num{font-family:var(--font-label);font-size:11px;width:22px;height:22px;flex-shrink:0;
     border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;
     color:var(--accent);margin-top:1px}
   .nav-check{margin-left:auto;color:var(--ok);font-size:14px;flex-shrink:0}
-  .nav-group-label{font-family:'Courier New',monospace;font-size:10px;letter-spacing:1.5px;
+  .nav-group-label{font-family:var(--font-label);font-size:10px;letter-spacing:1.5px;
     text-transform:uppercase;color:var(--gold);margin:18px 0 8px 10px}
 
   /* ---------- CONTENT ---------- */
@@ -73,10 +89,10 @@
   .module.active{display:block}
   @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-  .eyebrow{font-family:'Courier New',monospace;font-size:12px;letter-spacing:2px;
+  .eyebrow{font-family:var(--font-label);font-size:12px;letter-spacing:2px;
     text-transform:uppercase;color:var(--accent);margin-bottom:10px}
   h1{font-size:38px;line-height:1.15;font-weight:normal;margin-bottom:8px;letter-spacing:-.5px}
-  h1 .big{display:block;font-size:15px;font-family:'Courier New',monospace;color:var(--gold);
+  h1 .big{display:block;font-size:15px;font-family:var(--font-label);color:var(--gold);
     letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
   .lede{font-size:19px;color:var(--ink-soft);font-style:italic;margin-bottom:32px;line-height:1.6}
   h2{font-size:25px;font-weight:normal;margin:38px 0 14px;padding-bottom:8px;
@@ -92,7 +108,7 @@
     border-radius:0 var(--radius) var(--radius) 0;padding:16px 20px;margin:22px 0;box-shadow:0 2px 8px var(--shadow)}
   .callout.tip{border-left-color:var(--accent-2)}
   .callout.warn{border-left-color:var(--gold)}
-  .callout-label{font-family:'Courier New',monospace;font-size:11px;letter-spacing:1.5px;
+  .callout-label{font-family:var(--font-label);font-size:11px;letter-spacing:1.5px;
     text-transform:uppercase;color:var(--accent);margin-bottom:6px;font-weight:bold}
   .callout.tip .callout-label{color:var(--accent-2)}
   .callout.warn .callout-label{color:var(--gold)}
@@ -107,7 +123,7 @@
   tr:nth-child(even) td{background:var(--paper)}
 
   .example-artist{display:inline-block;background:var(--paper-2);border:1px solid var(--line);
-    border-radius:20px;padding:2px 12px;font-size:13px;font-family:'Courier New',monospace;
+    border-radius:20px;padding:2px 12px;font-size:13px;font-family:var(--font-label);
     color:var(--accent-2);margin:2px 4px 2px 0}
   a.example-artist{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;
     transition:border-color .15s,color .15s,background .15s}
@@ -119,7 +135,7 @@
   /* ---------- QUIZ ---------- */
   .quiz{background:var(--card);border:2px solid var(--accent);border-radius:8px;
     padding:26px 28px;margin:40px 0 20px;box-shadow:0 4px 16px var(--shadow)}
-  .quiz-head{font-family:'Courier New',monospace;font-size:13px;letter-spacing:2px;
+  .quiz-head{font-family:var(--font-label);font-size:13px;letter-spacing:2px;
     text-transform:uppercase;color:var(--accent);margin-bottom:4px}
   .quiz h3{color:var(--ink);margin-top:4px}
   .q{margin:22px 0;padding-bottom:20px;border-bottom:1px solid var(--line)}
@@ -132,7 +148,7 @@
   .q-opt.correct{border-color:var(--ok);background:rgba(47,125,79,.12);color:#1c5233}
   .q-opt.wrong{border-color:var(--bad);background:rgba(178,58,46,.1);color:#8a2b22}
   .q-opt.disabled{cursor:default;pointer-events:none}
-  .btn{font-family:'Courier New',monospace;font-size:14px;letter-spacing:1px;text-transform:uppercase;
+  .btn{font-family:var(--font-label);font-size:14px;letter-spacing:1px;text-transform:uppercase;
     background:var(--accent);color:#fff;border:none;padding:13px 28px;border-radius:var(--radius);
     cursor:pointer;transition:background .15s;margin-top:8px}
   .btn:hover{background:#7c2250}
@@ -154,7 +170,7 @@
       linear-gradient(135deg,#2c2358,#7c2a6e 45%,#d4622a 90%);
     color:#f4ecdf;box-shadow:0 12px 32px rgba(40,20,60,.35);
   }
-  .hero .kicker{font-family:'Courier New',monospace;letter-spacing:3px;text-transform:uppercase;
+  .hero .kicker{font-family:var(--font-label);letter-spacing:3px;text-transform:uppercase;
     color:#f0b25c;font-size:13px;margin-bottom:16px}
   .hero h1{font-size:52px;margin-bottom:16px;color:#fff;text-shadow:0 2px 18px rgba(20,10,40,.55)}
   .hero h1 em{color:#ffd9a0;font-style:italic}
@@ -170,12 +186,12 @@
   .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:36px 0}
   .feature{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent-2);
     border-radius:var(--radius);padding:20px;text-align:left;box-shadow:0 2px 8px var(--shadow)}
-  .feature .fnum{font-family:'Courier New',monospace;color:var(--gold);font-size:13px;margin-bottom:6px}
+  .feature .fnum{font-family:var(--font-label);color:var(--gold);font-size:13px;margin-bottom:6px}
   .feature h4{font-size:17px;margin-bottom:6px}
   .feature p{font-size:14px;color:var(--ink-soft);margin:0}
 
   .reset-link{font-size:12px;color:var(--ink-soft);text-decoration:underline;cursor:pointer;
-    display:inline-block;margin-top:14px;font-family:'Courier New',monospace}
+    display:inline-block;margin-top:14px;font-family:var(--font-label)}
 
   /* ---------- PÄTA ---------- */
   .site-footer{background:linear-gradient(180deg,#262047,#1b1735);color:#d9d2ec;
@@ -184,7 +200,7 @@
     grid-template-columns:1.3fr 1fr 1fr;gap:32px;align-items:start}
   .footer-logo{height:120px;width:auto;filter:invert(1);opacity:.95}
   .footer-tagline{font-style:italic;color:#b7aed6;margin-top:8px;font-size:15px}
-  .footer-head{font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;
+  .footer-head{font-family:var(--font-label);font-size:11px;letter-spacing:2px;
     text-transform:uppercase;color:#f0b25c;margin-bottom:10px}
   .footer-grid p{margin:0 0 8px;font-size:14px;color:#cfc8e8}
   .site-footer a{color:#fff;text-decoration:underline;text-decoration-thickness:1px;
@@ -203,7 +219,7 @@
     .content{padding:28px 20px 100px;max-width:100%}
     .menu-toggle{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:20;
       background:var(--accent);color:#fff;border:none;width:100%;padding:14px 20px;
-      font-family:'Courier New',monospace;letter-spacing:1px;text-transform:uppercase;
+      font-family:var(--font-label);letter-spacing:1px;text-transform:uppercase;
       font-size:13px;cursor:pointer}
     h1{font-size:30px}.hero h1{font-size:36px}.lede{font-size:17px}
     h2{font-size:22px}
@@ -414,7 +430,7 @@ const MODULES_P1 = [
     <p>Srdce piesne. Opakuje sa, obsahuje hlavnú myšlienku a musí byť <strong>zapamätateľný po prvom vypočutí</strong>. Kľúčové pravidlo: refrén hovorí to isté zakaždým a práve preto ho ľudia spievajú. Je jednoduchší a údernejší než verš.</p>
 
     <h3>Pre-chorus (pred-refrén)</h3>
-    <p>Nepovinný „mostík napätia“ medzi veršom a refrénom. Zvyšuje energiu, akoby si stúpal po schodoch pred skokom. Veľa piesní ho vynecháva, čo je legitímna voľba.</p>
+    <p>Nepovinný „mostík napätia“ medzi veršom a refrénom. Zvyšuje energiu, akoby si stúpal po schodoch pred skokom. Veľa piesní ho vynecháva čo je to legitímna voľba.</p>
 
     <h3>Bridge (mostík)</h3>
     <p>Prichádza zvyčajne raz, po druhom refréne. Prináša <strong>kontrast</strong> a inú melódiu, iný uhol pohľadu, zvrat. V texte to môže byť moment uvedomenia, otočenie príbehu alebo otázka bez odpovede. Bez bridgu pieseň často pôsobí repetitívne.</p>
@@ -884,7 +900,7 @@ Refrén (výbuch)</div>
     <p>Toto je <strong>kľúčové pravidlo slovenčiny</strong>. V slovenčine prízvuk takmer vždy padá na <strong>prvú slabiku slova</strong>. Angličtina to má inak (guitar → gui-<em>TAR</em>), a preto anglické pesničkové vzorce často v slovenčine „nesadnú“.</p>
     <p>Keď píšeš text, rytmický dôraz melódie by mal padať tam, kde reálne padá prízvuk. Ak dáš prízvučnú dobu na neprízvučnú slabiku, spevák to buď „zláme“, alebo to znie neprirodzene.</p>
 
-    <div class="lyric">MA-ma VA-rí, DE-ti SPI-a
+    <div class="lyric">MÁ-ma VA-rí, DE-ti SPÍ-a
 (prízvuk na prvej slabike každého slova — prirodzené)
 
 vs.
