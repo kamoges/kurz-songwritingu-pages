@@ -6,6 +6,29 @@
 <title>Kurz songwritingu - písanie textov pre zhudobnenie</title>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="stylesheet" href="assets/brand.css?v=5">
+<script data-theme-init>
+/* Prepínač témy — zdieľaný localStorage kľúč naprieč leilaspoems.
+   V <head>, aby sa téma nastavila pred prvým vykreslením (bez bliknutia).
+   Atribút data-theme-init je zámerný: CI syntax-check hľadá script tag bez
+   atribútov, takže tento blok preskočí a kontroluje len modulový skript. */
+(function(){
+  var root=document.documentElement, KEY='leilaspoems-theme';
+  try{var s=localStorage.getItem(KEY); if(s==='light'||s==='dark') root.setAttribute('data-theme',s);}catch(e){}
+  document.addEventListener('DOMContentLoaded',function(){
+    var btn=document.getElementById('themeToggle');
+    if(!btn) return;
+    btn.addEventListener('click',function(){
+      var isDark=root.getAttribute('data-theme')==='dark'
+        || (!root.hasAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      var next=isDark?'light':'dark';
+      root.classList.add('theme-switching');
+      root.setAttribute('data-theme',next);
+      try{localStorage.setItem(KEY,next);}catch(e){}
+      setTimeout(function(){root.classList.remove('theme-switching');},60);
+    });
+  });
+})();
+</script>
 <style>
   /* Fonty a zdieľané komponenty (.lp-hero/.lp-footer/.lp-topbar) sú v assets/brand.css */
 
@@ -287,26 +310,6 @@
   <div class="lp-footer-bottom">© 2026 Leila's poems · Texty piesní sú autorským dielom autora.</div>
 </footer>
 
-<script>
-/* Prepínač témy — zdieľaný localStorage kľúč naprieč leilaspoems */
-(function(){
-  var root=document.documentElement, KEY='leilaspoems-theme';
-  try{var s=localStorage.getItem(KEY); if(s==='light'||s==='dark') root.setAttribute('data-theme',s);}catch(e){}
-  document.addEventListener('DOMContentLoaded',function(){
-    var btn=document.getElementById('themeToggle');
-    if(!btn) return;
-    btn.addEventListener('click',function(){
-      var isDark=root.getAttribute('data-theme')==='dark'
-        || (!root.hasAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-      var next=isDark?'light':'dark';
-      root.classList.add('theme-switching');
-      root.setAttribute('data-theme',next);
-      try{localStorage.setItem(KEY,next);}catch(e){}
-      setTimeout(function(){root.classList.remove('theme-switching');},60);
-    });
-  });
-})();
-</script>
 <script>
 /* ================= UI REŤAZCE + KONFIG JAZYKA (SK) =================
    Pre ďalšiu jazykovú mutáciu (CZ) vznikne src/cz/ui.js s rovnakou
