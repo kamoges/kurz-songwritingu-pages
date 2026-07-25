@@ -14,7 +14,7 @@
     --paper-2:#efe8d8;
     --ink:#241f1a;
     --ink-soft:#5a5147;
-    --line:#d8cdb6;
+    --line:#a89876;
     --accent:#9c2b63;      /* hlboká magenta (z grafík leilaspoems) */
     --accent-2:#45418f;    /* indigo */
     --gold:#8a5216;        /* teplá oranžovo-zlatá (AA na papieri) */
@@ -36,29 +36,29 @@
     --on-accent:#fff;      /* text na sýtej ploche (akcent) */
   }
 
-  /* TMAVÁ TÉMA — magentová (teplá) vetva */
+  /* TMAVÁ TÉMA — teplá vetva (koral/amber; ružová sa v tmavom režime nepoužíva) */
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --paper:#17101c; --paper-2:#1f1626;
+      --paper:#17101c; --paper-2:#372a47;
       --ink:#f2ecf4; --ink-soft:#d2c6d6;
-      --line:#3b2d45;
-      --accent:#f26bad; --accent-2:#b9a5ff; --gold:#f0b25c;
-      --card:#1f1626; --shadow:rgba(0,0,0,.45);
+      --line:#7b6394;
+      --accent:#ff9a62; --accent-2:#b9a5ff; --gold:#f0b25c;
+      --card:#332543; --shadow:rgba(0,0,0,.45);
       --ok:#6ee7a5; --bad:#ff8577;
-      --ground:#17101c; --surface:#1f1626; --border:#3b2d45;
-      --muted:#b3a5ba; --link:#f26bad;
-      --on-accent:#17101c;   /* svetlá magenta v tmavej téme potrebuje tmavý text */
+      --ground:#17101c; --surface:#332543; --border:#7b6394;
+      --muted:#b3a5ba; --link:#ff9a62;
+      --on-accent:#17101c;   /* svetlý akcent v tmavej téme potrebuje tmavý text */
     }
   }
   :root[data-theme="dark"]{
-    --paper:#17101c; --paper-2:#1f1626;
+    --paper:#17101c; --paper-2:#372a47;
     --ink:#f2ecf4; --ink-soft:#d2c6d6;
-    --line:#3b2d45;
-    --accent:#f26bad; --accent-2:#b9a5ff; --gold:#f0b25c;
-    --card:#1f1626; --shadow:rgba(0,0,0,.45);
+    --line:#7b6394;
+    --accent:#ff9a62; --accent-2:#b9a5ff; --gold:#f0b25c;
+    --card:#332543; --shadow:rgba(0,0,0,.45);
     --ok:#6ee7a5; --bad:#ff8577;
-    --ground:#17101c; --surface:#1f1626; --border:#3b2d45;
-    --muted:#b3a5ba; --link:#f26bad;
+    --ground:#17101c; --surface:#332543; --border:#7b6394;
+    --muted:#b3a5ba; --link:#ff9a62;
     --on-accent:#17101c;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -195,13 +195,9 @@
      Základ je zdieľaný .lp-hero.hero-songwriting z assets/brand.css;
      tu len doplnky špecifické pre úvodný modul kurzu. */
   .hero{margin:0 0 10px;border-radius:10px;box-shadow:0 12px 32px rgba(40,20,60,.35)}
-  .hero .kicker{display:inline-flex;font-family:var(--font-label);letter-spacing:3px;
-    text-transform:uppercase;color:#fff;font-size:13px;margin-bottom:16px;
-    padding:6px 14px;border-radius:100px;
-    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3)}
   .hero h1{color:#fff;text-shadow:0 2px 18px rgba(20,10,40,.55)}
   .hero h1 em{color:#ffd9a0;font-style:italic}
-  .hero .sub{font-size:20px;color:#f2e9f5;font-style:italic;max-width:620px;margin:0 auto 10px;
+  .hero .sub{font-size:20px;color:#f2e9f5;font-style:italic;max-width:620px;margin:0 auto;
     text-shadow:0 1px 10px rgba(20,10,40,.5)}
 
   .intro-quote{background:var(--card);border-left:4px solid var(--gold);
@@ -397,9 +393,12 @@ const MODULES_P1 = [
   welcome:true,
   html:`
     <div class="hero lp-hero hero-songwriting">
-      <div class="kicker">Songwriting podľa Leila's poems · optimalizované pre Suno AI</div>
-      <h1>Ako písať texty,<br>ktoré <em>zaznejú</em></h1>
-      <p class="sub">Nestačí mať len „správny“ text, ale mať text s rytmom, dychom a vnútornou pravdou a taký, ktorý sa dá zhudobniť bez toho, aby sa slová lámali cez melódiu.</p>
+      <div class="lp-hero-inner">
+        <img class="lp-hero-logo" src="assets/logo-full.png" alt="leilaspoems" width="823" height="848">
+        <div class="lp-hero-eyebrow">Songwriting · optimalizované pre Suno AI</div>
+        <h1>Ako písať texty,<br>ktoré <span class="grad">zaznejú</span></h1>
+        <p class="sub">Nestačí mať len „správny“ text, ale mať text s rytmom, dychom a vnútornou pravdou a taký, ktorý sa dá zhudobniť bez toho, aby sa slová lámali cez melódiu.</p>
+      </div>
     </div>
 
     <div class="intro-quote">
