@@ -214,13 +214,10 @@
 
   .module-footer{display:flex;justify-content:space-between;margin-top:50px;gap:12px}
 
-  /* ---------- WELCOME / HERO ----------
-     Základ je zdieľaný .lp-hero.hero-songwriting z assets/brand.css;
-     tu len doplnky špecifické pre úvodný modul kurzu. */
-  .hero{margin:0 0 10px;border-radius:10px;box-shadow:0 12px 32px rgba(40,20,60,.35)}
-  .hero h1{color:#fff;text-shadow:0 2px 18px rgba(20,10,40,.55)}
-  .hero h1 em{color:#ffd9a0;font-style:italic}
-  .hero .sub{font-size:20px;color:#f2e9f5;font-style:italic;max-width:620px;margin:0 auto;
+  /* ---------- HERO ----------
+     Hlavička kurzu nad layoutom (rovnako ako mastering a landing).
+     Základ je zdieľaný .lp-hero.hero-songwriting z assets/brand.css. */
+  .lp-hero .sub{font-size:20px;color:#f2e9f5;font-style:italic;max-width:620px;margin:0 auto;
     text-shadow:0 1px 10px rgba(20,10,40,.5)}
 
   .intro-quote{background:var(--card);border-left:4px solid var(--gold);
@@ -259,6 +256,23 @@
 </style>
 </head>
 <body>
+<div class="lp-topbar">
+  <a class="lp-back" href="https://leilaspoems.com/">← leilaspoems</a>
+  <button class="lp-theme-toggle" id="themeToggle" type="button" aria-label="Prepnúť svetlú/tmavú tému">
+    <span class="sun" aria-hidden="true">☀︎</span><span class="moon" aria-hidden="true">☾</span>
+    <span>Téma</span>
+  </button>
+</div>
+
+<header class="lp-hero hero-songwriting">
+  <div class="lp-hero-inner">
+    <img class="lp-hero-logo" src="assets/logo-full.png" alt="leilaspoems" width="823" height="848">
+    <div class="lp-hero-eyebrow">Songwriting · optimalizované pre Suno AI</div>
+    <h1>Ako písať texty,<br>ktoré <span class="grad">zaznejú</span></h1>
+    <p class="sub">Nestačí mať len „správny“ text, ale mať text s rytmom, dychom a vnútornou pravdou a taký, ktorý sa dá zhudobniť bez toho, aby sa slová lámali cez melódiu.</p>
+  </div>
+</header>
+
 <button class="menu-toggle" onclick="toggleMenu()">☰ &nbsp;Obsah kurzu</button>
 <div class="wrap">
   <aside class="sidebar" id="sidebar">
@@ -268,13 +282,6 @@
         <div class="brand">Kurz songwritingu</div>
         <div class="brand-title">Ako písať texty,<br>ktoré <b>zaznejú</b></div>
       </div>
-    </div>
-    <div class="side-actions">
-      <a class="lp-back" href="https://leilaspoems.com/">← leilaspoems</a>
-      <button class="lp-theme-toggle" id="themeToggle" type="button" aria-label="Prepnúť svetlú/tmavú tému">
-        <span class="sun" aria-hidden="true">☀︎</span><span class="moon" aria-hidden="true">☾</span>
-        <span>Téma</span>
-      </button>
     </div>
     <div class="progress-box">
       <div>Tvoj postup: <b id="prog-label">0 / 19 modulov</b></div>
@@ -395,15 +402,6 @@ const MODULES_P1 = [
   id:"vitaj", group:"Úvod", num:"★", title:"Vitaj v kurze",
   welcome:true,
   html:`
-    <div class="hero lp-hero hero-songwriting">
-      <div class="lp-hero-inner">
-        <img class="lp-hero-logo" src="assets/logo-full.png" alt="leilaspoems" width="823" height="848">
-        <div class="lp-hero-eyebrow">Songwriting · optimalizované pre Suno AI</div>
-        <h1>Ako písať texty,<br>ktoré <span class="grad">zaznejú</span></h1>
-        <p class="sub">Nestačí mať len „správny“ text, ale mať text s rytmom, dychom a vnútornou pravdou a taký, ktorý sa dá zhudobniť bez toho, aby sa slová lámali cez melódiu.</p>
-      </div>
-    </div>
-
     <div class="intro-quote">
       <p>Poézia žije na papieri. Môže byť pokojne tichá, ťažká alebo krivá. Číta sa očami, v ľubovoľnom čase, a dovolí ti zastať a popremýšľať, kde chceš.</p>
       <p>Próza plynie. Buduje obraz sveta vetu za vetou, má priestor sa rozbehnúť, vysvetľovať, odbáčať.</p>
