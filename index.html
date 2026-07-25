@@ -5,14 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kurz songwritingu - písanie textov pre zhudobnenie</title>
 <link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/brand.css?v=5">
 <style>
-  /* Značkové fonty leilaspoems (self-hosted, latin + latin-ext pre SK/CZ) */
-  @font-face{font-family:'Atkinson Hyperlegible';font-style:normal;font-weight:400;font-display:swap;src:url('assets/atkinson-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-  @font-face{font-family:'Atkinson Hyperlegible';font-style:normal;font-weight:400;font-display:swap;src:url('assets/atkinson-400-latinext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-  @font-face{font-family:'Atkinson Hyperlegible';font-style:normal;font-weight:700;font-display:swap;src:url('assets/atkinson-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-  @font-face{font-family:'Atkinson Hyperlegible';font-style:normal;font-weight:700;font-display:swap;src:url('assets/atkinson-700-latinext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-  @font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:400 800;font-display:swap;src:url('assets/bricolage-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-  @font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:400 800;font-display:swap;src:url('assets/bricolage-latinext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+  /* Fonty a zdieľané komponenty (.lp-hero/.lp-footer/.lp-topbar) sú v assets/brand.css */
 
   :root{
     --paper:#f6f1e7;
@@ -22,7 +17,7 @@
     --line:#d8cdb6;
     --accent:#9c2b63;      /* hlboká magenta (z grafík leilaspoems) */
     --accent-2:#45418f;    /* indigo */
-    --gold:#b06a24;        /* teplá oranžovo-zlatá */
+    --gold:#8a5216;        /* teplá oranžovo-zlatá (AA na papieri) */
     --card:#fffdf8;
     --shadow:rgba(60,45,25,.12);
     --ok:#2f7d4f;
@@ -32,6 +27,39 @@
     --font-body:'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif;
     --font-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
     --font-label:'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif;
+    /* mapovanie na značkové tokeny, aby zdieľané komponenty ladili s kurzom */
+    --ground:var(--paper);
+    --surface:var(--card);
+    --border:var(--line);
+    --muted:var(--ink-soft);
+    --link:var(--accent);
+    --on-accent:#fff;      /* text na sýtej ploche (akcent) */
+  }
+
+  /* TMAVÁ TÉMA — magentová (teplá) vetva */
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#17101c; --paper-2:#1f1626;
+      --ink:#f2ecf4; --ink-soft:#d2c6d6;
+      --line:#3b2d45;
+      --accent:#f26bad; --accent-2:#b9a5ff; --gold:#f0b25c;
+      --card:#1f1626; --shadow:rgba(0,0,0,.45);
+      --ok:#6ee7a5; --bad:#ff8577;
+      --ground:#17101c; --surface:#1f1626; --border:#3b2d45;
+      --muted:#b3a5ba; --link:#f26bad;
+      --on-accent:#17101c;   /* svetlá magenta v tmavej téme potrebuje tmavý text */
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#17101c; --paper-2:#1f1626;
+    --ink:#f2ecf4; --ink-soft:#d2c6d6;
+    --line:#3b2d45;
+    --accent:#f26bad; --accent-2:#b9a5ff; --gold:#f0b25c;
+    --card:#1f1626; --shadow:rgba(0,0,0,.45);
+    --ok:#6ee7a5; --bad:#ff8577;
+    --ground:#17101c; --surface:#1f1626; --border:#3b2d45;
+    --muted:#b3a5ba; --link:#f26bad;
+    --on-accent:#17101c;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -68,15 +96,17 @@
     text-transform:uppercase;color:var(--accent);margin-bottom:6px}
   .brand-title{font-size:22px;line-height:1.25;font-weight:normal}
   .brand-title b{font-weight:bold}
+  .side-actions{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  .side-actions .lp-back,.side-actions .lp-theme-toggle{font-size:13px;padding:6px 12px}
   .progress-box{background:var(--card);border:1px solid var(--line);
     border-radius:var(--radius);padding:12px 14px;margin-bottom:22px;font-size:13px}
   .progress-bar{height:7px;background:var(--line);border-radius:10px;overflow:hidden;margin-top:8px}
   .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent-2),var(--accent) 55%,var(--gold));width:0;transition:width .4s ease}
   .nav-item{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border-radius:var(--radius);
     cursor:pointer;font-size:14px;color:var(--ink-soft);transition:background .15s,color .15s;margin-bottom:2px}
-  .nav-item:hover{background:rgba(156,43,99,.07);color:var(--ink)}
-  .nav-item.active{background:var(--accent);color:#fff}
-  .nav-item.active .nav-num{color:#fff;border-color:rgba(255,255,255,.5)}
+  .nav-item:hover{background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--ink)}
+  .nav-item.active{background:var(--accent);color:var(--on-accent)}
+  .nav-item.active .nav-num{color:var(--on-accent);border-color:color-mix(in srgb,var(--on-accent) 50%,transparent)}
   .nav-num{font-family:var(--font-label);font-size:11px;width:22px;height:22px;flex-shrink:0;
     border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;
     color:var(--accent);margin-top:1px}
@@ -118,7 +148,7 @@
 
   table{width:100%;border-collapse:collapse;margin:20px 0;font-size:15px;background:var(--card);
     border-radius:var(--radius);overflow:hidden;box-shadow:0 2px 8px var(--shadow)}
-  th{background:var(--accent-2);color:#fff;text-align:left;padding:11px 14px;font-weight:bold;font-size:14px}
+  th{background:var(--accent-2);color:var(--on-accent);text-align:left;padding:11px 14px;font-weight:bold;font-size:14px}
   td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}
   tr:nth-child(even) td{background:var(--paper)}
 
@@ -130,7 +160,7 @@
   a.example-artist::after{content:" ▶";font-size:9px;color:var(--gold)}
   a.example-artist.suno{color:var(--accent);border-color:var(--accent)}
   a.example-artist.suno::after{content:" ♪";font-size:11px;color:var(--accent)}
-  a.example-artist:hover{border-color:var(--accent);color:var(--accent);background:#fff}
+  a.example-artist:hover{border-color:var(--accent);color:var(--accent);background:var(--card)}
 
   /* ---------- QUIZ ---------- */
   .quiz{background:var(--card);border:2px solid var(--accent);border-radius:8px;
@@ -143,38 +173,35 @@
   .q-text{font-weight:bold;margin-bottom:12px;font-size:16px}
   .q-opt{display:block;padding:11px 16px;margin:7px 0;background:var(--paper);
     border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;transition:all .15s;font-size:15px}
-  .q-opt:hover{border-color:var(--accent);background:#fff}
-  .q-opt.selected{border-color:var(--accent);background:rgba(156,43,99,.08)}
-  .q-opt.correct{border-color:var(--ok);background:rgba(47,125,79,.12);color:#1c5233}
-  .q-opt.wrong{border-color:var(--bad);background:rgba(178,58,46,.1);color:#8a2b22}
+  .q-opt:hover{border-color:var(--accent);background:var(--card)}
+  .q-opt.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+  .q-opt.correct{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ink)}
+  .q-opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent);color:var(--ink)}
   .q-opt.disabled{cursor:default;pointer-events:none}
   .btn{font-family:var(--font-label);font-size:14px;letter-spacing:1px;text-transform:uppercase;
-    background:var(--accent);color:#fff;border:none;padding:13px 28px;border-radius:var(--radius);
+    background:var(--accent);color:var(--on-accent);border:none;padding:13px 28px;border-radius:var(--radius);
     cursor:pointer;transition:background .15s;margin-top:8px}
-  .btn:hover{background:#7c2250}
+  .btn:hover{background:color-mix(in srgb,var(--accent) 82%,var(--ink))}
   .btn.secondary{background:transparent;color:var(--accent);border:1px solid var(--accent)}
-  .btn.secondary:hover{background:rgba(156,43,99,.08)}
+  .btn.secondary:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
   .quiz-result{margin-top:20px;padding:18px;border-radius:var(--radius);font-size:16px;display:none}
   .quiz-result.show{display:block}
-  .quiz-result.pass{background:rgba(47,125,79,.12);border:1px solid var(--ok);color:#1c5233}
-  .quiz-result.fail{background:rgba(178,58,46,.1);border:1px solid var(--bad);color:#8a2b22}
+  .quiz-result.pass{background:color-mix(in srgb,var(--ok) 14%,transparent);border:1px solid var(--ok);color:var(--ink)}
+  .quiz-result.fail{background:color-mix(in srgb,var(--bad) 12%,transparent);border:1px solid var(--bad);color:var(--ink)}
 
   .module-footer{display:flex;justify-content:space-between;margin-top:50px;gap:12px}
 
-  /* ---------- WELCOME / HERO ---------- */
-  .hero{
-    text-align:center;padding:64px 34px 56px;margin:0 0 10px;border-radius:10px;
-    background:
-      linear-gradient(180deg,rgba(26,16,50,.78),rgba(44,20,66,.60) 55%,rgba(26,16,50,.82)),
-      url("assets/hero.webp") center/cover no-repeat,
-      linear-gradient(135deg,#2c2358,#7c2a6e 45%,#d4622a 90%);
-    color:#f4ecdf;box-shadow:0 12px 32px rgba(40,20,60,.35);
-  }
-  .hero .kicker{font-family:var(--font-label);letter-spacing:3px;text-transform:uppercase;
-    color:#f0b25c;font-size:13px;margin-bottom:16px}
-  .hero h1{font-size:52px;margin-bottom:16px;color:#fff;text-shadow:0 2px 18px rgba(20,10,40,.55)}
+  /* ---------- WELCOME / HERO ----------
+     Základ je zdieľaný .lp-hero.hero-songwriting z assets/brand.css;
+     tu len doplnky špecifické pre úvodný modul kurzu. */
+  .hero{margin:0 0 10px;border-radius:10px;box-shadow:0 12px 32px rgba(40,20,60,.35)}
+  .hero .kicker{display:inline-flex;font-family:var(--font-label);letter-spacing:3px;
+    text-transform:uppercase;color:#fff;font-size:13px;margin-bottom:16px;
+    padding:6px 14px;border-radius:100px;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3)}
+  .hero h1{color:#fff;text-shadow:0 2px 18px rgba(20,10,40,.55)}
   .hero h1 em{color:#ffd9a0;font-style:italic}
-  .hero .sub{font-size:20px;color:#eadff2;font-style:italic;max-width:620px;margin:0 auto 10px;
+  .hero .sub{font-size:20px;color:#f2e9f5;font-style:italic;max-width:620px;margin:0 auto 10px;
     text-shadow:0 1px 10px rgba(20,10,40,.5)}
 
   .intro-quote{background:var(--card);border-left:4px solid var(--gold);
@@ -193,21 +220,7 @@
   .reset-link{font-size:12px;color:var(--ink-soft);text-decoration:underline;cursor:pointer;
     display:inline-block;margin-top:14px;font-family:var(--font-label)}
 
-  /* ---------- PÄTA ---------- */
-  .site-footer{background:linear-gradient(180deg,#262047,#1b1735);color:#d9d2ec;
-    padding:46px 40px 26px;border-top:3px solid var(--accent)}
-  .footer-grid{max-width:860px;margin:0 auto;display:grid;
-    grid-template-columns:1.3fr 1fr 1fr;gap:32px;align-items:start}
-  .footer-logo{height:120px;width:auto;filter:invert(1);opacity:.95}
-  .footer-tagline{font-style:italic;color:#b7aed6;margin-top:8px;font-size:15px}
-  .footer-head{font-family:var(--font-label);font-size:11px;letter-spacing:2px;
-    text-transform:uppercase;color:#f0b25c;margin-bottom:10px}
-  .footer-grid p{margin:0 0 8px;font-size:14px;color:#cfc8e8}
-  .site-footer a{color:#fff;text-decoration:underline;text-decoration-thickness:1px;
-    text-underline-offset:3px}
-  .site-footer a:hover{color:#f0b25c}
-  .footer-bottom{max-width:860px;margin:28px auto 0;padding-top:16px;
-    border-top:1px solid rgba(255,255,255,.14);font-size:13px;color:#a79ecb}
+  /* ---------- PÄTA — zdieľaná (.lp-footer) z assets/brand.css ---------- */
 
   /* ---------- MOBILE ---------- */
   .menu-toggle{display:none}
@@ -218,14 +231,11 @@
     .sidebar.open{display:block}
     .content{padding:28px 20px 100px;max-width:100%}
     .menu-toggle{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:20;
-      background:var(--accent);color:#fff;border:none;width:100%;padding:14px 20px;
+      background:var(--accent);color:var(--on-accent);border:none;width:100%;padding:14px 20px;
       font-family:var(--font-label);letter-spacing:1px;text-transform:uppercase;
       font-size:13px;cursor:pointer}
-    h1{font-size:30px}.hero h1{font-size:36px}.lede{font-size:17px}
+    h1{font-size:30px}.lede{font-size:17px}
     h2{font-size:22px}
-    .hero{padding:44px 22px 40px}
-    .footer-grid{grid-template-columns:1fr;gap:24px}
-    .site-footer{padding:34px 22px 22px}
   }
 </style>
 </head>
@@ -240,6 +250,13 @@
         <div class="brand-title">Ako písať texty,<br>ktoré <b>zaznejú</b></div>
       </div>
     </div>
+    <div class="side-actions">
+      <a class="lp-back" href="https://leilaspoems.com/">← leilaspoems</a>
+      <button class="lp-theme-toggle" id="themeToggle" type="button" aria-label="Prepnúť svetlú/tmavú tému">
+        <span class="sun" aria-hidden="true">☀︎</span><span class="moon" aria-hidden="true">☾</span>
+        <span>Téma</span>
+      </button>
+    </div>
     <div class="progress-box">
       <div>Tvoj postup: <b id="prog-label">0 / 19 modulov</b></div>
       <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
@@ -251,25 +268,49 @@
   <main class="content" id="content"></main>
 </div>
 
-<footer class="site-footer">
-  <div class="footer-grid">
-    <div>
-      <img class="footer-logo" src="assets/logo-full.png" alt="Leila's poems">
-      <div class="footer-tagline">Poézia, ktorá znie</div>
+<footer class="lp-footer">
+  <div class="lp-footer-inner">
+    <div class="lp-footer-brand">
+      <div class="lp-footer-logo">
+        <img class="lp-footer-emblem" src="assets/logo-emblem.png" alt="" width="38" height="55">
+        <span class="lp-footer-name">leilaspoems</span>
+      </div>
+      <p class="lp-footer-tagline">Poézia, ktorá znie</p>
     </div>
-    <div>
-      <div class="footer-head">Kontakt</div>
+    <div class="lp-footer-col">
+      <h4>Kontakt</h4>
       <p><a href="mailto:leilas.poems@gmail.com">leilas.poems@gmail.com</a></p>
+      <p><a href="https://leilaspoems.com/">Všetky kurzy</a></p>
     </div>
-    <div>
-      <div class="footer-head">O kurze</div>
+    <div class="lp-footer-col">
+      <h4>O kurze</h4>
       <p>Verzia kurzu 1.9 · slovenská</p>
       <p>Optimalizované pre Suno AI v5.5</p>
     </div>
   </div>
-  <div class="footer-bottom">© 2026 Leila's poems · Texty piesní sú autorským dielom autora.</div>
+  <div class="lp-footer-bottom">© 2026 Leila's poems · Texty piesní sú autorským dielom autora.</div>
 </footer>
 
+<script>
+/* Prepínač témy — zdieľaný localStorage kľúč naprieč leilaspoems */
+(function(){
+  var root=document.documentElement, KEY='leilaspoems-theme';
+  try{var s=localStorage.getItem(KEY); if(s==='light'||s==='dark') root.setAttribute('data-theme',s);}catch(e){}
+  document.addEventListener('DOMContentLoaded',function(){
+    var btn=document.getElementById('themeToggle');
+    if(!btn) return;
+    btn.addEventListener('click',function(){
+      var isDark=root.getAttribute('data-theme')==='dark'
+        || (!root.hasAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      var next=isDark?'light':'dark';
+      root.classList.add('theme-switching');
+      root.setAttribute('data-theme',next);
+      try{localStorage.setItem(KEY,next);}catch(e){}
+      setTimeout(function(){root.classList.remove('theme-switching');},60);
+    });
+  });
+})();
+</script>
 <script>
 /* ================= UI REŤAZCE + KONFIG JAZYKA (SK) =================
    Pre ďalšiu jazykovú mutáciu (CZ) vznikne src/cz/ui.js s rovnakou
@@ -355,7 +396,7 @@ const MODULES_P1 = [
   id:"vitaj", group:"Úvod", num:"★", title:"Vitaj v kurze",
   welcome:true,
   html:`
-    <div class="hero">
+    <div class="hero lp-hero hero-songwriting">
       <div class="kicker">Songwriting podľa Leila's poems · optimalizované pre Suno AI</div>
       <h1>Ako písať texty,<br>ktoré <em>zaznejú</em></h1>
       <p class="sub">Nestačí mať len „správny“ text, ale mať text s rytmom, dychom a vnútornou pravdou a taký, ktorý sa dá zhudobniť bez toho, aby sa slová lámali cez melódiu.</p>
