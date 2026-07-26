@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kurz songwritingu - písanie textov pre zhudobnenie</title>
 <link rel="icon" type="image/png" href="assets/favicon.png">
-<link rel="stylesheet" href="assets/brand.css?v=5">
+<link rel="stylesheet" href="assets/brand.css?v=6">
+<!-- Prednačítanie kritických zdrojov (písma + logo v hero = LCP) -->
+<link rel="preload" href="assets/fonts/bricolage-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/atkinson-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/logo-full.webp" as="image" fetchpriority="high">
 <script data-theme-init>
 /* Prepínač témy — zdieľaný localStorage kľúč naprieč leilaspoems.
    V <head>, aby sa téma nastavila pred prvým vykreslením (bez bliknutia).
@@ -258,7 +262,7 @@
 <body>
 <div class="lp-topbar">
   <a class="lp-back" href="https://leilaspoems.com/">← leilaspoems</a>
-  <button class="lp-theme-toggle" id="themeToggle" type="button" aria-label="Prepnúť svetlú/tmavú tému">
+  <button class="lp-theme-toggle" id="themeToggle" type="button" aria-label="Téma: prepnúť svetlý alebo tmavý režim">
     <span class="sun" aria-hidden="true">☀︎</span><span class="moon" aria-hidden="true">☾</span>
     <span>Téma</span>
   </button>
@@ -266,7 +270,7 @@
 
 <header class="lp-hero hero-songwriting">
   <div class="lp-hero-inner">
-    <img class="lp-hero-logo" src="assets/logo-full.png" alt="leilaspoems" width="823" height="848">
+    <img class="lp-hero-logo" src="assets/logo-full.webp" alt="leilaspoems" width="823" height="848">
     <div class="lp-hero-eyebrow">Songwriting · optimalizované pre Suno AI</div>
     <h1>Ako písať texty,<br>ktoré <span class="grad">zaznejú</span></h1>
     <p class="sub">Nestačí mať len „správny“ text, ale mať text s rytmom, dychom a vnútornou pravdou a taký, ktorý sa dá zhudobniť bez toho, aby sa slová lámali cez melódiu.</p>
@@ -277,7 +281,7 @@
 <div class="wrap">
   <aside class="sidebar" id="sidebar">
     <div class="brand-row">
-      <img class="side-logo" src="assets/logo-emblem.png" alt="Leila's poems">
+      <img class="side-logo" src="assets/logo-emblem.webp" alt="Leila's poems">
       <div>
         <div class="brand">Kurz songwritingu</div>
         <div class="brand-title">Ako písať texty,<br>ktoré <b>zaznejú</b></div>
@@ -298,7 +302,7 @@
   <div class="lp-footer-inner">
     <div class="lp-footer-brand">
       <div class="lp-footer-logo">
-        <img class="lp-footer-emblem" src="assets/logo-emblem.png" alt="" width="38" height="55">
+        <img class="lp-footer-emblem" src="assets/logo-emblem.webp" alt="" width="38" height="55">
         <span class="lp-footer-name">leilaspoems</span>
       </div>
       <p class="lp-footer-tagline">Poézia, ktorá znie</p>
